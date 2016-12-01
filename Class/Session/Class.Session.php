@@ -552,6 +552,12 @@ class Session extends DbObj
     private function setcookie($name, $value = null, $expire = null, $path = null, $domain = null, $secure = null, $httponly = null)
     {
         if ($this->sendCookie) {
+            if ($path === null) {
+                $webRootPath = self::getWebRootPath();
+                if ($webRootPath !== false) {
+                    $path = preg_replace(':/+:', '/', $webRootPath);
+                }
+            }
             return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
         return false;
