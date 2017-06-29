@@ -162,7 +162,7 @@ class AuthenticatorManager
         $freedom_authprovider = getDbAccessValue('freedom_authprovider');
         
         if ($freedom_authprovider == "") {
-            $freedom_authprovider = "apache";
+            $freedom_authprovider = "html";
         }
         
         return trim($freedom_authprovider);
@@ -178,6 +178,9 @@ class AuthenticatorManager
     public static function getAuthType()
     {
         if (array_key_exists('authtype', $_GET)) {
+            if ($_GET['authtype'] === "apache") {
+                throw new \Dcp\Exception(sprintf("apache authtype not allowed.\n"));
+            }
             return $_GET['authtype'];
         }
         if (!empty($_GET[OpenAuthenticator::openGetId])) {
@@ -199,7 +202,7 @@ class AuthenticatorManager
         $freedom_authtype = getDbAccessValue('freedom_authtype');
         
         if ($freedom_authtype == "") {
-            $freedom_authtype = "apache";
+            $freedom_authtype = "html";
         }
         
         return trim($freedom_authtype);
