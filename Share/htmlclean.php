@@ -108,8 +108,16 @@ class htmlclean
          * @var \libXMLError[] $libXMLErrors
          */
         $libXMLErrors = array();
+        $libXMLOpts = LIBXML_NONET;
+        if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
+            /*
+             * LIBXML_HTML_NOIMPLIED is available in libxml >= 2.7.7
+             * LIBXML_HTML_NODEFDTD is available in libxml >= 2.7.8
+            */
+            $libXMLOpts|= LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD;
+        }
         try {
-            $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET, $libXMLErrors);
+            $dom->loadHTML($html, $libXMLOpts, $libXMLErrors);
         }
         catch(XDOMDocumentException $e) {
             $error = $e->getMessage();
@@ -160,8 +168,16 @@ class htmlclean
          * @var \libXMLError[] $libXMLErrors
          */
         $libXMLErrors = array();
+        $libXMLOpts = LIBXML_NONET;
+        if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
+            /*
+             * LIBXML_HTML_NOIMPLIED is available in libxml >= 2.7.7
+             * LIBXML_HTML_NODEFDTD is available in libxml >= 2.7.8
+            */
+            $libXMLOpts|= LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD;
+        }
         try {
-            $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NONET, $libXMLErrors);
+            $dom->loadHTML($html, $libXMLOpts, $libXMLErrors);
         }
         catch(XDOMDocumentException $e) {
             $error = $e->getMessage();
