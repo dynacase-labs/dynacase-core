@@ -159,6 +159,16 @@ function createSentMessage($to, $from, $cc, $bcc, $subject, &$mimemail, &$doc = 
     $err = '';
     $msg = createDoc(getDbAccessFreedom() , "SENTMESSAGE", true);
     if ($msg) {
+        /* Drop the display name if present, and keep only the mail address */
+        try {
+            $mailAddrParser = new \Dcp\Mail\MailAddrParser();
+            $res = $mailAddrParser->parse($from);
+            if (count($res) > 0) {
+                $from = $res[0]->address;
+            }
+        }
+        catch(\Dcp\Mail\MailAddrParserException $e) {
+        }
         $msg->setValue("emsg_from", $from);
         $msg->setValue("emsg_date", Doc::getTimeDate());
         $msg->setValue("emsg_subject", $subject);

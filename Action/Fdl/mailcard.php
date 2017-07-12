@@ -200,7 +200,6 @@ $addfiles = array() , $userinfo = null, $savecopy = false)
     $ftitle = str_replace("&", "", $ftitle);
     
     $to = str_replace("\"", "'", $to);
-    $from = str_replace("\"", "'", $from);
     $cc = str_replace("\"", "'", $cc);
     $bcc = str_replace("\"", "'", $bcc);
     
@@ -219,7 +218,7 @@ $addfiles = array() , $userinfo = null, $savecopy = false)
         }
     }
     if ($from == "") {
-        $from = getMailAddr($action->user->id);
+        $from = getMailAddr($action->user->id, true);
         if ($from == "") $from = getParam('SMTP_FROM');
         if ($from == "") $from = $action->user->login . '@' . php_uname('n');
     }

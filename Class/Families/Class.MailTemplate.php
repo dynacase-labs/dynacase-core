@@ -316,7 +316,7 @@ class MailTemplate extends \Dcp\Family\Document
         $bcc = implode(',', $dest['bcc']);
         $from = implode(',', $dest['from']); // only one value expected for from
         if ($from == "") {
-            $from = getMailAddr($action->user->id);
+            $from = getMailAddr($action->user->id, true);
         }
         if ($from == "") {
             $from = getParam('SMTP_FROM');
