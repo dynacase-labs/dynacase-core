@@ -138,6 +138,12 @@ $app_const = array(
         "user" => "N",
         "descr" => N_("SMTP default from if not")
     ) ,
+    "SMTP_SENDER" => array(
+        "val" > "",
+        "global" => "Y",
+        "user" => "N",
+        "descr" => N_("SMTP sender")
+    ) ,
     "FDL_FULLIDX" => array(
         "val" => "gist",
         "descr" => N_("fulltext index mode") ,
