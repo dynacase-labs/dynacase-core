@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Platform\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-02 09:00+0100\n"
+"POT-Creation-Date: 2017-07-12 15:47+0200\n"
 "PO-Revision-Date: 2017-02-02 09:03+0100\n"
 "Last-Translator: Matthieu Codron <matthieu.codron+dev@anakeen.com>\n"
 "Language-Team: français <>\n"
@@ -3766,6 +3766,9 @@ msgstr "Nom du serveur SMTP"
 
 msgid "SMTP login"
 msgstr "Nom d'utilisateur pour la connexion SMTP"
+
+msgid "SMTP sender"
+msgstr "Adresse système pour l'envoi de mail"
 
 msgid "SMTP password"
 msgstr "Mot de passe pour la connexion SMTP"

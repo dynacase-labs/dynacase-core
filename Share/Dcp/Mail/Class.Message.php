@@ -49,6 +49,12 @@ class Message
      */
     public $from = null;
     /**
+     * SMTP transport sender address ('MAIL FROM:')
+     *
+     * @var Address
+     */
+    public $sender = null;
+    /**
      * @var Address[]
      */
     public $to = array();
@@ -111,6 +117,22 @@ class Message
             $addr = $this->stringToAddress($address);
             if (count($addr) > 0) {
                 $this->from = $addr[0];
+            }
+        }
+    }
+    /**
+     * Set SMTP sender transport address ('MAIL FROM:')
+     *
+     * @param Address|string $address
+     */
+    public function setSender($address)
+    {
+        if ($this->isAddress($address)) {
+            $this->sender = $address;
+        } elseif (is_scalar($address)) {
+            $addr = $this->stringToAddress($address);
+            if (count($addr) > 0) {
+                $this->sender = $addr[0];
             }
         }
     }
@@ -283,6 +305,21 @@ class Message
             $password = getParam('SMTP_PASSWORD');
             $mail->Username = $login;
             $mail->Password = $password;
+        }
+        if (!isset($this->sender)) {
+            $sender = getParam('SMTP_SENDER', '');
+            if ($sender !== '') {
+                /* Set "Reply-To:" with "From:" address */
+                if (isset($this->from)) {
+                    $mail->addReplyTo($this->from->address);
+                }
+                /* and set "MAIL FROM:" and "From:" with sender address */
+                $this->setSender($sender);
+                $this->setFrom($sender);
+            }
+        }
+        if (isset($this->sender)) {
+            $mail->Sender = $this->sender->address;
         }
         if (isset($this->from)) {
             $mail->From = $this->from->address;
