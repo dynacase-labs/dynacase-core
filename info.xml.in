@@ -5,7 +5,8 @@
     <description lang="fr">Serveur d'application dynacase core</description>
 
     <replaces>
-        <module name="dynacase-platform"/>
+        <module name="dynacase-platform" />
+        <module name="dynacase-core-patchset-20170717" />
     </replaces>
 
     <requires>
