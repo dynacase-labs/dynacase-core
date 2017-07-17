@@ -400,10 +400,10 @@ function handleActionException($e)
             if ($e->getHttpHeader()) {
                 header($e->getHttpHeader());
             } else {
-                header("HTTP/1.1 500 Dynacase Uncaugth Exception");
+                header("HTTP/1.1 500 Dynacase Uncaught Exception");
             }
         } else {
-            header("HTTP/1.1 500 Dynacase Uncaugth Exception");
+            header("HTTP/1.1 500 Dynacase Uncaught Exception");
         }
     }
     errorLogException($e);
