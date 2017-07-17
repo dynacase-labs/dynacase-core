@@ -309,16 +309,24 @@ class Message
         if (!isset($this->sender)) {
             $sender = getParam('SMTP_SENDER', '');
             if ($sender !== '') {
-                /* Set "Reply-To:" with "From:" address */
-                if (isset($this->from)) {
-                    $mail->addReplyTo($this->from->address);
+                $parsedMail = $this->stringToAddress($sender);
+                if (count($parsedMail) > 0) {
+                    $sender = $parsedMail[0];
+                    if (isset($this->from)) {
+                        /* Copy original "From:" into "Sender:" */
+                        $mail->addCustomHeader('Sender', $this->from->address);
+                        /* Set "Reply-To:" with original "From:" address */
+                        $mail->addReplyTo($this->from->address, $this->from->name);
+                    }
+                    /* Set envelope sender */
+                    $this->setSender($sender->address);
+                    /* Overwrite original "From:" with envelope sender address while keeping original display name */
+                    $this->setFrom(new Address($sender->address, $this->from->name));
                 }
-                /* and set "MAIL FROM:" and "From:" with sender address */
-                $this->setSender($sender);
-                $this->setFrom($sender);
             }
         }
         if (isset($this->sender)) {
+            /* Set envelope sender address */
             $mail->Sender = $this->sender->address;
         }
         if (isset($this->from)) {
