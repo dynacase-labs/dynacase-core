@@ -115,7 +115,7 @@ $trash = "", $simplesearch = false, $folderRecursiveLevel = 2, $join = '', $only
         $fromid = $m['sign'] . getFamIdFromName($dbaccess, $m['fromid']);
     }
     $table = "doc";
-    $qsql = '';
+    $qsql = array();
     if ($trash == "only") $distinct = true;
     if ($fromid == - 1) $table = "docfam";
     elseif ($simplesearch) $table = "docread";

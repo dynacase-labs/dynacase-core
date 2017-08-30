@@ -139,7 +139,7 @@ $app_const = array(
         "descr" => N_("SMTP default from if not")
     ) ,
     "SMTP_SENDER" => array(
-        "val" > "",
+        "val" => "",
         "global" => "Y",
         "user" => "N",
         "descr" => N_("SMTP sender")
