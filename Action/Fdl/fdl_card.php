@@ -49,12 +49,15 @@ function fdl_card(&$action)
     
     if ($docid == "") $action->exitError(_("no document reference"));
     if (!is_numeric($docid)) $docid = getIdFromName($dbaccess, $docid);
-    if (intval($docid) == 0) $action->exitError(sprintf(_("unknow logical reference '%s'") , GetHttpVars("id")));
+    if (intval($docid) == 0) $action->exitError(sprintf(_("unknow logical reference '%s'") , htmlspecialchars(GetHttpVars("id") , ENT_QUOTES)));
     $doc = new_Doc($dbaccess, $docid);
     if (!$doc->isAffected()) {
         $err = simpleQuery($dbaccess, sprintf("select id from dochisto where id=%d limit 1", $docid) , $hashisto, true, true);
-        if ($hashisto) $action->exitError(sprintf(_("Document %s has been destroyed.") , $docid) . sprintf(" <a href='?app=FDL&action=VIEWDESTROYDOC&id=%s'>%s</a>", $docid, _("See latest information about it.")));
-        else $action->exitError(sprintf(_("cannot see unknow reference %s") , $docid));
+        if ($hashisto) {
+            $action->exitError(sprintf(_("Document %s has been destroyed.") , htmlspecialchars($docid, ENT_QUOTES)) . sprintf(" <a href='?app=FDL&action=VIEWDESTROYDOC&id=%s'>%s</a>", urlencode($docid) , htmlspecialchars(_("See latest information about it.") , ENT_QUOTES)) , true);
+        } else {
+            $action->exitError(htmlspecialchars(sprintf(_("cannot see unknow reference %s") , $docid)) , ENT_QUOTES);
+        }
     }
     
     if ($unlock) {
@@ -66,7 +69,7 @@ function fdl_card(&$action)
     if ($state != "") {
         $docid = $doc->getRevisionState($state, true);
         if ($docid == 0) {
-            $action->exitError(sprintf(_("Document %s in %s state not found") , $doc->title, _($state)));
+            $action->exitError(sprintf(_("Document %s in %s state not found") , htmlspecialchars($doc->title, ENT_QUOTES) , htmlspecialchars(_($state) , ENT_QUOTES)));
         }
         SetHttpVar("id", $docid);
     } else {
@@ -118,7 +121,7 @@ function fdl_card(&$action)
             $cvdoc->set($doc);
             
             $err = $cvdoc->control(trim($vid)); // control special view
-            if ($err != "") $action->exitError("CV:" . $cvdoc->title . "\n" . $err);
+            if ($err != "") $action->exitError("CV:" . htmlspecialchars($cvdoc->title, ENT_QUOTES) . "\n" . $err);
             $tview = $cvdoc->getView($vid);
             $zone = $tview["CV_ZVIEW"];
         }
