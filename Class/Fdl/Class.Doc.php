@@ -2749,7 +2749,21 @@ create unique index i_docir on doc(initid, revision);";
         $tsa = $this->GetNeededAttributes();
         $err = "";
         foreach ($tsa as $k => $v) {
-            if ($this->getRawValue($v->id) == "") $err.= sprintf(_("%s needed\n") , $v->getLabel());
+            if ($v->inArray()) {
+                /* Check for empty cells in columns */
+                $columnValues = $this->getMultipleRawValues($v->id);
+                foreach ($columnValues as $value) {
+                    if ($value == "") {
+                        $err.= sprintf(_("%s needed\n") , $v->getLabel());
+                        /* Do not report multiple errors for the same column */
+                        break;
+                    }
+                }
+            } else {
+                if ($this->getRawValue($v->id) == "") {
+                    $err.= sprintf(_("%s needed\n") , $v->getLabel());
+                }
+            }
         }
         return $err;
     }
