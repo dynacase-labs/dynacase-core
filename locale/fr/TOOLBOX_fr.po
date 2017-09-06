@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Platform\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-12 15:47+0200\n"
+"POT-Creation-Date: 2017-09-06 16:47+0200\n"
 "PO-Revision-Date: 2017-02-02 09:03+0100\n"
 "Last-Translator: Matthieu Codron <matthieu.codron+dev@anakeen.com>\n"
 "Language-Team: français <>\n"
@@ -1247,6 +1247,19 @@ msgstr "Impossible de trouver l'id de la famille '%s'."
 #, php-format
 msgid "Could not open '%s' for reading."
 msgstr "Ne peut ouvrir '%s' pour lecture."
+
+#, php-format
+msgid ""
+"Could not perform transition because the document is being edited by '%s'"
+msgstr ""
+"La transition n'a pas pu être effectuée car le document est en cours "
+"d'édition par '%s'"
+
+#, php-format
+msgid "Could not perform transition because the document is locked by '%s'"
+msgstr ""
+"La transition n'a pas pu être effectuée car le document est verrouillé par "
+"'%s'"
 
 msgid "Create"
 msgstr "Créer"
