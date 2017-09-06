@@ -29,7 +29,7 @@ class TestWorflowTransition extends TestCaseDcpCommonFamily
      * @param $end
      * @param $passExpectedError
      */
-    public function testTransitionCondition($famId, $start, $end, $passExpectedError, $customStore = null)
+    public function testTransitionCondition($famId, $start, $end, $passExpectedError, $customStore = null, $customSetState = null)
     {
         $wf = new_doc(self::$dbaccess, "WTST_M0M3");
         $this->assertTrue($wf->isAlive() , "cannot find document WTST_M0M3");
@@ -43,14 +43,21 @@ class TestWorflowTransition extends TestCaseDcpCommonFamily
         } else {
             $err = $d->store();
         }
-        $this->assertEmpty($err, "cannot create ${famId} document");
+        $this->assertEmpty($err, "cannot create ${famId} document: ${err}");
         
-        $err = $d->setState($end);
+        if (is_callable($customSetState)) {
+            $err = $customSetState($d, $end);
+        } else {
+            $err = $d->setState($end);
+        }
         if ($passExpectedError == '') {
             $this->assertEmpty($err, sprintf("transition %s -> %s is not passed : %s", $start, $end, $err));
         } else {
             
             $this->assertContains($passExpectedError, $err, sprintf("transition %s -> %s is passed and must not", $start, $end));
+        }
+        if (isset(self::$user)) {
+            $this->exitSudo();
         }
     }
     /**
@@ -173,6 +180,123 @@ class TestWorflowTransition extends TestCaseDcpCommonFamily
                         'Row 2'
                     ));
                     return $doc->store();
+                }
+            ) ,
+            /*
+             * Locked documents
+            */
+            array(
+                /*
+                 * Locked by myself: transition is allowed
+                */
+                'TST_WFFAM_DEV_7062',
+                \WTestM0M3::SB,
+                \WTestM0M3::SD,
+                '',
+                function (\Dcp\Family\Document & $doc)
+                {
+                    /*
+                     * Lock document with User #1
+                    */
+                    /** @var \Dcp\Family\Iuser $user1 */
+                    $user1 = new_Doc('', 'DEV_6072_U1');
+                    $userId1 = $user1->getRawValue('us_whatid');
+                    $err = array();
+                    $err[] = $doc->store();
+                    $err[] = $doc->lock(true, $userId1);
+                    $err[] = $doc->store();
+                    return join("\n", array_filter($err, function ($elmt)
+                    {
+                        return strlen($elmt) > 0;
+                    }));
+                }
+                ,
+                function (\Dcp\Family\Document & $doc, $newState)
+                {
+                    /*
+                     * Change state with User #1
+                    */
+                    $this->sudo('dev_6072_u1');
+                    /* Re-fetch document from database */
+                    $doc = new_Doc(self::$dbaccess, $doc->id);
+                    $err = $doc->setState($newState);
+                    return $err;
+                }
+            ) ,
+            array(
+                /*
+                 * Document being modified by another user: transition not allowed
+                */
+                'TST_WFFAM_DEV_7062',
+                \WTestM0M3::SB,
+                \WTestM0M3::SD,
+                sprintf(_("Could not perform transition because the document is being edited by '%s'") , 'User #1') ,
+                function (\Dcp\Family\Document & $doc)
+                {
+                    /*
+                     * (auto)Lock document with User #1
+                    */
+                    /** @var \Dcp\Family\Iuser $user1 */
+                    $user1 = new_Doc('', 'DEV_6072_U1');
+                    $userId1 = $user1->getRawValue('us_whatid');
+                    $err = array();
+                    $err[] = $doc->store();
+                    $err[] = $doc->lock(true, $userId1);
+                    $err[] = $doc->store();
+                    return join("\n", array_filter($err, function ($elmt)
+                    {
+                        return strlen($elmt) > 0;
+                    }));
+                }
+                ,
+                function (\Dcp\Family\Document & $doc, $newState)
+                {
+                    /*
+                     * Change state with User #2
+                    */
+                    $this->sudo('dev_6072_u2');
+                    /* Re-fetch document from database */
+                    $doc = new_Doc(self::$dbaccess, $doc->id);
+                    $err = $doc->setState($newState);
+                    return $err;
+                }
+            ) ,
+            array(
+                /*
+                 * Document explicitly locked by another user: transition not allowed
+                */
+                'TST_WFFAM_DEV_7062',
+                \WTestM0M3::SB,
+                \WTestM0M3::SD,
+                sprintf(_("Could not perform transition because the document is locked by '%s'") , 'User #1') ,
+                function (\Dcp\Family\Document & $doc)
+                {
+                    /*
+                     * Lock document with User #1
+                    */
+                    /** @var \Dcp\Family\Iuser $user1 */
+                    $user1 = new_Doc('', 'DEV_6072_U1');
+                    $userId1 = $user1->getRawValue('us_whatid');
+                    $err = array();
+                    $err[] = $doc->store();
+                    $err[] = $doc->lock(false, $userId1);
+                    $err[] = $doc->store();
+                    return join("\n", array_filter($err, function ($elmt)
+                    {
+                        return strlen($elmt) > 0;
+                    }));
+                }
+                ,
+                function (\Dcp\Family\Document & $doc, $newState)
+                {
+                    /*
+                     * Change state with User #2
+                    */
+                    $this->sudo('dev_6072_u2');
+                    /* Re-fetch document from database */
+                    $doc = new_Doc(self::$dbaccess, $doc->id);
+                    $err = $doc->setState($newState);
+                    return $err;
                 }
             )
         );
