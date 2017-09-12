@@ -164,7 +164,7 @@ class Timer extends \Dcp\Family\Document
             for ($i = 0; $i < $repeat; $i++) {
                 $this->lineActions[$level] = array(
                     "level" => $level,
-                    "delay" => $v["tm_delay"] + ($v["tm_hdelay"] / 24) ,
+                    "delay" => doubleval($v["tm_delay"]) + (doubleval($v["tm_hdelay"]) / 24) ,
                     "actions" => array(
                         "state" => $v["tm_state"],
                         "tmail" => $v["tm_tmail"],
