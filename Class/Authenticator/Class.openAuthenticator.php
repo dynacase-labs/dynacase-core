@@ -31,7 +31,6 @@ class openAuthenticator extends Authenticator
     public function checkAuthentication()
     {
         include_once ('WHAT/Lib.Http.php');
-        
         $privatekey = static::getTokenId();
         if (!$privatekey) return Authenticator::AUTH_NOK;
         $this->privatelogin = $this->getLoginFromPrivateKey($privatekey);
@@ -55,9 +54,15 @@ class openAuthenticator extends Authenticator
         $tokenId = getHttpVars(self::openGetId, getHttpVars("privateid"));
         if (!$tokenId) {
             $headers = apache_request_headers();
+            
             if (!empty($headers["Authorization"])) {
+                $hAuthorization = $headers["Authorization"];
+            } elseif (!empty($headers["authorization"])) {
+                $hAuthorization = $headers["authorization"];
+            }
+            if (!empty($hAuthorization)) {
                 
-                if (preg_match(sprintf("/%s\\s+(.*)$/", self::openAuthorizationScheme) , $headers["Authorization"], $reg)) {
+                if (preg_match(sprintf("/%s\\s+(.*)$/", self::openAuthorizationScheme) , $hAuthorization, $reg)) {
                     $tokenId = trim($reg[1]);
                 }
             }

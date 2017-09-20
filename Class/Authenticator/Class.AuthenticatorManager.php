@@ -213,7 +213,12 @@ class AuthenticatorManager
         if (php_sapi_name() !== 'cli') {
             $headers = apache_request_headers();
             if (!empty($headers["Authorization"])) {
-                if (preg_match("/^([a-z0-9]+)\\s+(.*)$/i", $headers["Authorization"], $reg)) {
+                $hAuthorization = $headers["Authorization"];
+            } elseif (!empty($headers["authorization"])) {
+                $hAuthorization = $headers["authorization"];
+            }
+            if (!empty($hAuthorization)) {
+                if (preg_match("/^([a-z0-9]+)\\s+(.*)$/i", $hAuthorization, $reg)) {
                     return trim($reg[1]);
                 }
             }
