@@ -99,9 +99,8 @@ class Session extends DbObj
         }
         // set cookie session
         if (!empty($_SERVER['HTTP_HOST'])) {
-            if (empty($_SERVER["REDIRECT_URL"])) {
-                $this->setCookieSession($this->id, $this->SetTTL());
-            }
+            
+            $this->setCookieSession($this->id, $this->SetTTL());
         }
         return true;
     }
@@ -163,6 +162,11 @@ class Session extends DbObj
     }
     function setCookieSession($id, $ttl = 0)
     {
+        if (isset($_COOKIE[$this->name]) && $ttl === 0) {
+            // No resend if already sended and ttl is until browser close connexion
+            return;
+        }
+        
         $webRootPath = self::getWebRootPath();
         if ($webRootPath !== false) {
             $cookiePath = preg_replace(':/+:', '/', $webRootPath);
