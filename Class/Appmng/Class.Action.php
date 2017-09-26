@@ -605,10 +605,9 @@ create sequence SEQ_ID_ACTION;
     /**
      * display error to user and stop execution
      * @param string $texterr the error message
-     * @param bool $exit if false , no exit are pêrformed
-     * @throws Dcp\Core\Exception
+     * @param bool $exit if false , no exit are performed
+     * @throws \Dcp\Core\Exception
      * @api abort action execution
-     * @return void
      */
     public function exitError($texterr, $exit = true)
     {
@@ -616,15 +615,16 @@ create sequence SEQ_ID_ACTION;
             //      redirect($this,"CORE&sole=Y","ERROR");
             $this->lay = new Layout("CORE/Layout/error.xml", $this);
             $this->lay->set("TITLE", _("Error"));
-            $this->lay->set("error", cleanhtmljs(nl2br($texterr)));
-            $this->lay->set("serror", json_encode(cleanhtmljs($texterr) , JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP));
+            header('Warning: ' . strtok($texterr, "\n"));
+            $texterr = cleanhtmljs(\Dcp\Utils\htmlclean::normalizeHTMLFragment(nl2br($texterr)));
+            $this->lay->set("error", $texterr);
+            $this->lay->set("serror", json_encode($texterr, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP));
             $this->lay->set("appname", (empty($this->parent)) ? '' : $this->parent->name);
             $this->lay->set("appact", $this->name);
             if ($this->parent && $this->parent->parent) { // reset js ans ccs
                 $this->parent->parent->cssref = array();
                 $this->parent->parent->jsref = array();
             }
-            header('Warning: ' . strtok($texterr, "\n"));
             print $this->lay->gen();
             if ($exit) {
                 exit;
