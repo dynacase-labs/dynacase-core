@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Toolbox\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-12 15:47+0200\n"
+"POT-Creation-Date: 2017-09-06 16:47+0200\n"
 "PO-Revision-Date: 2016-11-18 15:26+0100\n"
 "Last-Translator: Matthieu Codron <matthieu.codron+dev@anakeen.com>\n"
 "Language-Team: English team <>\n"
@@ -1217,6 +1217,15 @@ msgstr ""
 
 #, php-format
 msgid "Could not open '%s' for reading."
+msgstr ""
+
+#, php-format
+msgid ""
+"Could not perform transition because the document is being edited by '%s'"
+msgstr ""
+
+#, php-format
+msgid "Could not perform transition because the document is locked by '%s'"
 msgstr ""
 
 msgid "Create"

@@ -743,6 +743,23 @@ class WDoc extends Doc
         if ($this->userid != 1) { // admin can go to any states
             if (!$foundTo) return (sprintf(_("ChangeState :: the new state '%s' is not known or is not allowed from %s") , _($newstate) , _($this->doc->state)));
             if (!$foundFrom) return (sprintf(_("ChangeState :: the initial state '%s' is not known") , _($this->doc->state)));
+            if ($this->doc->isLocked()) {
+                $lockUserId = abs($this->doc->locked);
+                $lockUserAccount = getDocFromUserId($this->dbaccess, $lockUserId);
+                if (is_object($lockUserAccount) && $lockUserAccount->isAlive()) {
+                    $lockUserTitle = $lockUserAccount->getTitle();
+                    if ($lockUserId != $this->userid) {
+                        /* The document is locked by another user */
+                        if ($this->doc->locked < 0) {
+                            /* Currently being edited by another user */
+                            return sprintf(_("Could not perform transition because the document is being edited by '%s'") , $lockUserTitle);
+                        } else {
+                            /* Explicitly locked by another user */
+                            return sprintf(_("Could not perform transition because the document is locked by '%s'") , $lockUserTitle);
+                        }
+                    }
+                }
+            }
         }
         // verify if privilege granted
         if ($withcontrol) $err = $this->control($tname);
