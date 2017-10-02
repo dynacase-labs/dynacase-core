@@ -67,7 +67,7 @@ function getOnefamMenu($onefam, $famid, $defaultMenu)
                         unset($defaultMenu[$idMenu]["items"][$kMenu]);
                     }
                 }
-                if (is_array($aMenu["custom"])) {
+                if (isset($aMenu["custom"]) && is_array($aMenu["custom"])) {
                     $defaultMenu[$idMenu]["items"] = array_merge($defaultMenu[$idMenu]["items"], $aMenu["custom"]);
                 }
                 if (count($defaultMenu[$idMenu]["items"]) == 0) {
@@ -78,7 +78,7 @@ function getOnefamMenu($onefam, $famid, $defaultMenu)
             }
         }
     }
-    $customMenu = $specMenu["customMenu"];
+    $customMenu = (isset($specMenu["customMenu"]) ? $specMenu["customMenu"] : null);
     if (is_array($customMenu)) {
         foreach ($customMenu as $kc => $cMenu) {
             if (!empty($cMenu["before"])) {
