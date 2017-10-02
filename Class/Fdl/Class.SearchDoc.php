@@ -215,7 +215,11 @@ class SearchDoc
         return false;
     }
     /**
-     * count results without return data
+     * Count results without returning data.
+     *
+     * Note:
+     * - The setStart() and setSlice() parameters are not used when counting with this method.
+     *
      * @api send query search and only count results
      *
      * @return int the number of results
