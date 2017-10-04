@@ -107,32 +107,44 @@ class Crontab
             return FALSE;
         }
         
-        $crontab = "# BEGIN:FREEDOM_CRONTAB:" . DEFAULT_PUBDIR . ":" . $file . "\n" . "CONTEXT_ROOT=" . DEFAULT_PUBDIR . "\n" . $crontab . "\n" . "# END:FREEDOM_CRONTAB:" . DEFAULT_PUBDIR . ":" . $file . "\n";
+        $newSectionElement = new \Dcp\CrontabSectionElement(DEFAULT_PUBDIR, $file);
+        $newSectionElement->appendChild(new \Dcp\CrontabTextElement(sprintf("CONTEXT_ROOT=%s", DEFAULT_PUBDIR)));
+        $newSectionElement->appendChild(new \Dcp\CrontabTextElement($crontab));
         
-        $activeCrontab = $this->load();
-        if ($activeCrontab === FALSE) {
+        $crontabData = $this->load();
+        if ($crontabData === FALSE) {
             error_log(__CLASS__ . "::" . __FUNCTION__ . " Error reading active crontab");
             return FALSE;
         }
         
-        if (preg_match('/^#\s+BEGIN:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':' . preg_quote($file, '/') . '.*?#\s+END:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':' . preg_quote($file, '/') . '$/ms', $activeCrontab) === 1) {
-            print "Removing existing crontab\n";
-            $tmpCrontab = preg_replace('/^#\s+BEGIN:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':' . preg_quote($file, '/') . '.*?#\s+END:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':' . preg_quote($file, '/') . '$/ms', '', $activeCrontab);
-            if ($tmpCrontab === NULL) {
-                error_log(__CLASS__ . "::" . __FUNCTION__ . " Error removing existing registered crontab");
-                return FALSE;
+        $parser = new \Dcp\CrontabParser();
+        $crontabDocument = $parser->parse($crontabData);
+        /* Remove existing sections for this context and file */
+        $crontabDocument->childs = array_filter($crontabDocument->childs, function ($element) use ($file)
+        {
+            if (is_a($element, \Dcp\CrontabSectionElement::class))
+            {
+                /**
+                 * @var $element \Dcp\CrontabSectionElement
+                 */
+                /* Keep sections that do not match this context/file */
+                return !$element->match(DEFAULT_PUBDIR, $file);
             }
-            $activeCrontab = $tmpCrontab;
-        }
+            /* Keep text elements */
+            return true;
+        });
+        /* Add new section */
+        $crontabDocument->appendChild($newSectionElement);
         
-        $activeCrontab.= $crontab;
-        $this->crontab = $activeCrontab;
+        $this->crontab = (string)$crontabDocument;
         
+        printf("Saving crontab...\n");
         $ret = $this->save();
         if ($ret === FALSE) {
             error_log(__CLASS__ . "::" . __FUNCTION__ . " Error saving crontab");
             return FALSE;
         }
+        printf("Done.\n");
         
         return $this->crontab;
     }
@@ -141,25 +153,38 @@ class Crontab
     {
         include_once ('WHAT/Lib.Prefix.php');
         
-        $activeCrontab = $this->load();
-        if ($activeCrontab === FALSE) {
+        $crontabData = $this->load();
+        if ($crontabData === FALSE) {
             error_log(__CLASS__ . "::" . __FUNCTION__ . " Error reading active crontab");
             return FALSE;
         }
         
-        $tmpCrontab = preg_replace('/^#\s+BEGIN:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':' . preg_quote($file, '/') . '.*?#\s+END:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':' . preg_quote($file, '/') . '$/ms', '', $activeCrontab);
-        if ($tmpCrontab === NULL) {
-            error_log(__CLASS__ . "::" . __FUNCTION__ . " Error unregistering crontab '" . DEFAULT_PUBDIR . ":" . $file . "' from active crontab");
-            return FALSE;
-        }
+        $parser = new \Dcp\CrontabParser();
+        $crontabDocument = $parser->parse($crontabData);
+        /* Remove existing sections for this context/file */
+        $crontabDocument->childs = array_filter($crontabDocument->childs, function (\Dcp\CrontabElement & $element) use ($file)
+        {
+            if (is_a($element, \Dcp\CrontabSectionElement::class))
+            {
+                /**
+                 * @var $element \Dcp\CrontabSectionElement
+                 */
+                /* Keep sections that do not match this context/file */
+                return !$element->match(DEFAULT_PUBDIR, $file);
+            }
+            /* Keep other elements */
+            return true;
+        });
         
-        $this->crontab = $tmpCrontab;
+        $this->crontab = (string)$crontabDocument;
         
+        printf("Saving crontab...\n");
         $ret = $this->save();
         if ($ret === FALSE) {
             error_log(__CLASS__ . "::" . __FUNCTION__ . " Error saving crontab");
             return FALSE;
         }
+        printf("Done.\n");
         
         return $this->crontab;
     }
@@ -188,25 +213,29 @@ class Crontab
     {
         include_once ('WHAT/Lib.Prefix.php');
         
-        $activeCrontab = $this->load();
-        if ($activeCrontab === FALSE) {
+        $crontabData = $this->load();
+        if ($crontabData === FALSE) {
             error_log(__CLASS__ . "::" . __FUNCTION__ . " Error reading active crontab");
             return FALSE;
         }
         
-        $ret = preg_match_all('/^#\s+BEGIN:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':(.*?)\n(.*?)\n#\s+END:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':\1/ms', $activeCrontab, $matches, PREG_SET_ORDER);
-        if ($ret === FALSE) {
-            error_log(__CLASS__ . "::" . __FUNCTION__ . " Error in preg_match_all");
-            return FALSE;
-        }
+        $parser = new \Dcp\CrontabParser();
+        $crontabDocument = $parser->parse($crontabData);
         
         $crontabs = array();
-        foreach ($matches as $match) {
-            array_push($crontabs, array(
-                'file' => $match[1],
-                'content' => $match[2]
-            ));
+        foreach ($crontabDocument->childs as & $element) {
+            /**
+             * @var $element \Dcp\CrontabSectionElement
+             */
+            if (is_a($element, \Dcp\CrontabSectionElement::class) && $element->matchContextRoot(DEFAULT_PUBDIR))
+            {
+                array_push($crontabs, array(
+                    'file' => $element->file,
+                    'content' => (string)$element
+                ));
+            }
         }
+        unset($element);
         
         return $crontabs;
     }
@@ -215,25 +244,38 @@ class Crontab
     {
         include_once ('WHAT/Lib.Prefix.php');
         
-        $activeCrontab = $this->load();
-        if ($activeCrontab === FALSE) {
+        $crontabData = $this->load();
+        if ($crontabData === FALSE) {
             error_log(__CLASS__ . "::" . __FUNCTION__ . " Error reading active crontab");
             return FALSE;
         }
         
-        $tmpCrontab = preg_replace('/^#\s+BEGIN:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':.*?^#\s+END:FREEDOM_CRONTAB:' . preg_quote(DEFAULT_PUBDIR, '/') . ':.*?$/ms', '', $activeCrontab);
-        if ($tmpCrontab === NULL) {
-            error_log(__CLASS__ . "::" . __FUNCTION__ . " Error unregistering all crontab for context '" . DEFAULT_PUBDIR . "'");
-            return FALSE;
-        }
+        $parser = new \Dcp\CrontabParser();
+        $crontabDocument = $parser->parse($crontabData);
+        /* Remove existing sections for this context */
+        $crontabDocument->childs = array_filter($crontabDocument->childs, function (\Dcp\CrontabElement & $element)
+        {
+            if (is_a($element, \Dcp\CrontabSectionElement::class))
+            {
+                /**
+                 * @var $element \Dcp\CrontabSectionElement
+                 */
+                /* Keep sections that do not match the current context */
+                return !$element->matchContextRoot(DEFAULT_PUBDIR);
+            }
+            /* Keep other elements */
+            return true;
+        });
         
-        $this->crontab = $tmpCrontab;
+        $this->crontab = (string)$crontabDocument;
         
+        printf("Saving crontab...\n");
         $ret = $this->save();
         if ($ret === FALSE) {
             error_log(__CLASS__ . "::" . __FUNCTION__ . " Error saving crontab");
             return FALSE;
         }
+        printf("Done.\n");
         
         return $this->crontab;
     }
