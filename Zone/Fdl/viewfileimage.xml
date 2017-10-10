@@ -5,7 +5,7 @@
  */
 addEvent(window,'load', function () {
 var wf=new widgetFile({documentId:[docid],attributeId:'[attrid]',index:[index],mimeIcon:'[mimeicon]',vid:[vid],
-                       fileLink:'[filelink]', fileTitle:'[filetitle]', pages:[pages], waiting:[waiting], pdfLink:'[pdflink]'});
+                       fileLink:'[filelink]', fileTitle:[filetitle], pages:[pages], waiting:[waiting], pdfLink:'[pdflink]'});
 wf.show({target:document.getElementById('file[docid]-[attrid][index]'),
          type:'[viewtype]',
          showPager:true,

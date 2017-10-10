@@ -393,7 +393,7 @@ class DocHtmlFormat
             $htmlval = "<a target=\"_blank\" href=\"";
             $htmlval.= "cid:" . $this->oattr->id;
             if ($this->index >= 0) $htmlval.= "+$this->index";
-            $htmlval.= "\">" . $fname . "</a>";
+            $htmlval.= "\">" . htmlspecialchars($fname, ENT_QUOTES) . "</a>";
         } else {
             if ($fileInfo) {
                 if ($fileInfo->teng_state < 0 || $fileInfo->teng_state > 1) {
@@ -485,7 +485,7 @@ class DocHtmlFormat
                             $lay->set("viewtype", $viewfiletype);
                             $lay->set("mimeicon", $mimeicon);
                             $lay->set("vid", ($infopdf ? $infopdf->id_file : $vid));
-                            $lay->set("filetitle", $fname);
+                            $lay->set("filetitle", json_encode((string)$fname));
                             $lay->set("height", $this->oattr->getOption('viewfileheight', '300px'));
                             $lay->set("filelink", $this->doc->getFileLink($this->oattr->id, $idx, false, false));
                             
@@ -511,7 +511,7 @@ class DocHtmlFormat
                         $inline = $this->oattr->getOption("inline");
                         $htmlval = "<a onmousedown=\"document.noselect=true;\" title=\"$size\" target=\"$utarget\" type=\"$mime\" href=\"" . $this->doc->getFileLink($this->oattr->id, $idx, false, ($inline == "yes") , $avalue, $fileInfo) . "\">";
                         if ($mimeicon) $htmlval.= "<img class=\"mime\" needresize=1  src=\"Images/$mimeicon\">&nbsp;";
-                        $htmlval.= $fname . "</a>";
+                        $htmlval.= htmlspecialchars($fname, ENT_QUOTES) . "</a>";
                     }
                 } else {
                     $htmlval = $fileInfo->name;
