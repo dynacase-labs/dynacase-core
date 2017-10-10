@@ -572,6 +572,14 @@ return allfld;
 end;
 $$ language 'plpgsql';
 
+/*
+ * Refresh family views
+ * --------------------
+ */
+
+/*
+ * Refresh all family views
+ */
 CREATE OR REPLACE FUNCTION refreshFamilySchemaViews()
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -583,9 +591,70 @@ IF NOT FOUND THEN
   EXECUTE 'CREATE SCHEMA family';
 END IF;
 -- Refresh views
-FOR r IN SELECT 'CREATE OR REPLACE VIEW family.' || quote_ident(lower(name)) || ' AS SELECT * FROM ' || quote_ident('doc' || id) AS query FROM docfam ORDER BY id LOOP
+FOR r IN SELECT 'DROP VIEW IF EXISTS family.' || quote_ident(lower(name)) || '; CREATE VIEW family.' || quote_ident(lower(name)) || ' AS SELECT * FROM ' || quote_ident('doc' || id) AS query FROM docfam ORDER BY id LOOP
   EXECUTE r.query;
 END LOOP;
 RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+/*
+ * Refresh family view given a family name
+ */
+CREATE OR REPLACE FUNCTION refreshFamilySchemaViews(familyName text)
+  RETURNS BOOLEAN AS $$
+DECLARE
+  r RECORD;
+BEGIN
+  -- Create family schema if not exists
+  SELECT * INTO r FROM information_schema.schemata WHERE schema_name = 'family';
+  IF NOT FOUND THEN
+    EXECUTE 'CREATE SCHEMA family';
+  END IF;
+  -- Refresh views
+  FOR r IN SELECT 'DROP VIEW IF EXISTS family.' || quote_ident(lower(name)) || '; CREATE VIEW family.' || quote_ident(lower(name)) || ' AS SELECT * FROM ' || quote_ident('doc' || id) AS query FROM docfam WHERE name = familyName ORDER BY id LOOP
+    EXECUTE r.query;
+  END LOOP;
+  RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+/*
+ * Refresh family view given a family id
+ */
+CREATE OR REPLACE FUNCTION refreshFamilySchemaViews(familyId int)
+  RETURNS BOOLEAN AS $$
+DECLARE
+  r RECORD;
+BEGIN
+  -- Create family schema if not exists
+  SELECT * INTO r FROM information_schema.schemata WHERE schema_name = 'family';
+  IF NOT FOUND THEN
+    EXECUTE 'CREATE SCHEMA family';
+  END IF;
+  -- Refresh views
+  FOR r IN SELECT 'DROP VIEW IF EXISTS family.' || quote_ident(lower(name)) || '; CREATE VIEW family.' || quote_ident(lower(name)) || ' AS SELECT * FROM ' || quote_ident('doc' || id) AS query FROM docfam WHERE id = familyId ORDER BY id LOOP
+    EXECUTE r.query;
+  END LOOP;
+  RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+/*
+ * Force refresh of family view with given name and id
+ */
+CREATE OR REPLACE FUNCTION refreshFamilySchemaViews(familyName text, familyId int)
+  RETURNS BOOLEAN AS $$
+DECLARE
+  r RECORD;
+BEGIN
+  -- Create family schema if not exists
+  SELECT * INTO r FROM information_schema.schemata WHERE schema_name = 'family';
+  IF NOT FOUND THEN
+    EXECUTE 'CREATE SCHEMA family';
+  END IF;
+  -- Refresh views
+  EXECUTE 'DROP VIEW IF EXISTS family.' || quote_ident(lower(familyName)) || '; CREATE VIEW family.' || quote_ident(lower(familyName)) || ' AS SELECT * FROM ' || quote_ident('doc' || familyId);
+  RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql;

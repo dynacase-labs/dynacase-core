@@ -735,7 +735,7 @@ class FamilyImport
     
     protected static function recreateFamilyView($dbaccess, $docname, $docid)
     {
-        simpleQuery($dbaccess, sprintf("CREATE OR REPLACE VIEW family.%s AS SELECT * FROM %s", pg_escape_identifier($docname) , pg_escape_identifier(sprintf("doc%s", $docid))) , $res, true, true, true);
+        simpleQuery($dbaccess, sprintf("SELECT refreshFamilySchemaViews(%s, %s)", pg_escape_literal($docname) , pg_escape_literal(intval($docid))) , $res, true, true, true);
     }
     
     protected static function getTableColumns($dbaccess, $schemaName, $tableName)
