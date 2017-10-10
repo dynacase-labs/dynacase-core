@@ -57,10 +57,18 @@ foreach ($argv as $k => $v) {
         }
     } else if (preg_match("/--(.+)/", $v, $reg)) {
         if ($reg[1] == "listapi") {
+            $apiList = array();
+            foreach (new DirectoryIterator(DEFAULT_PUBDIR . DIRECTORY_SEPARATOR . 'API') as $entry) {
+                if (preg_match('/^(?<basename>.+)\.php$/', $entry->getFilename() , $m)) {
+                    $apiList[] = $m['basename'];
+                }
+            }
+            sort($apiList, SORT_STRING | SORT_FLAG_CASE);
             print "application list :\n";
-            echo "\t- ";
-            echo str_replace("\n", "\n\t- ", shell_exec(sprintf("cd %s/API;ls -1 *.php| cut -f1 -d'.'", escapeshellarg(DEFAULT_PUBDIR))));
-            echo "\n";
+            foreach ($apiList as $api) {
+                printf("\t- %s\n", $api);
+            }
+            print "\n";
             exit;
         }
         $_GET[$reg[1]] = true;
@@ -103,22 +111,22 @@ try {
     } else {
         $appl = $core;
     }
-
+    
     $action = new Action();
     if (isset($_GET["action"])) {
         $action->Set($_GET["action"], $appl);
     } else {
         $action->Set("", $appl);
     }
-
+    
     if (!$core->user->isAffected()) {
         throw new Dcp\Core\Exception("CORE0013", $_GET["userid"]);
     }
-
+    
     if ($core->user->status === "D") {
         throw new Dcp\Core\Exception("CORE0014", $_GET["userid"]);
     }
-
+    
     if ($action->canExecute("CORE_ADMIN_ROOT", "CORE_ADMIN") === '') {
         // Authorize administrators to execute admin actions
         $action->parent->setAdminMode();
