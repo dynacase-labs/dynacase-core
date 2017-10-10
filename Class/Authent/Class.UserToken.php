@@ -66,8 +66,7 @@ class UserToken extends DbObj
     CREATE INDEX usertoken_idx ON usertoken(token);
   ";
     
-    var $hAlg = 'sha1';
-    var $rndSize = 4;
+    var $tokenByteLength = 20; // Token size: 160 bits (equal to SHA1 digest output length)
     var $expiration = 86400; // 24 hours
     const INFINITY = "infinity";
     
@@ -78,18 +77,6 @@ class UserToken extends DbObj
         }
         $this->cdate = date("Y-m-d H:i:s");
         $this->authorid = getCurrentUser()->id;
-    }
-    
-    public function setHAlg($hAlg)
-    {
-        $this->hAlg = $hAlg;
-        return $this->hAlg;
-    }
-    
-    public function setRndSize($rndSize)
-    {
-        $this->rndSize = $rndSize;
-        return $this->rndSize;
     }
     
     public function setExpiration($expiration = "")
@@ -116,27 +103,12 @@ class UserToken extends DbObj
     }
     public function genToken()
     {
-        $rnd = rand();
-        for ($i = 0; $i < $this->rndSize; $i++) {
-            $rnd.= mt_rand();
+        $strong = false;
+        $bytes = openssl_random_pseudo_bytes($this->tokenByteLength, $strong);
+        if ($bytes === false || $strong === false) {
+            throw new \Dcp\Exception(sprintf("Unable to get cryptographically strong random bytes from openssl: your system might be broken or too old."));
         }
-        
-        switch (strtolower($this->hAlg)) {
-            case 'sha1':
-                return sha1($rnd);
-                break;
-
-            case 'md5':
-                return md5($rnd);
-                break;
-
-            case 'raw':
-                return $rnd;
-                break;
-        }
-        
-        error_log(__CLASS__ . "::" . __FUNCTION__ . " " . "Unknown hAlg " . $this->hAlg . ". Will return raw random value.");
-        return $rnd;
+        return bin2hex($bytes);
     }
     
     public function getToken()
