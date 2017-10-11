@@ -63,6 +63,13 @@ if [ $RET -ne 0 ]; then
     exit $RET
 fi
 
+PGSERVICE="$pgservice_core" psql --set ON_ERROR_STOP=on -f "$wpub/FDL/fdl.sql"
+RET=$?
+if [ $RET -ne 0 ]; then
+    echo "Error loading '$wpub/FDL/fdl.sql'!"
+    exit $RET
+fi
+
 "$wpub/wsh.php" --api=generateDocumentClass --docid=1
 "$wpub"/wsh.php --api=importDocuments --file="$wpub/FDL/cv_init.csv" --csv-separator=';' --csv-enclosure='"'
 
