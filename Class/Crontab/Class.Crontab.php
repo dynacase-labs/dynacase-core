@@ -122,8 +122,7 @@ class Crontab
         /* Remove existing sections for this context and file */
         $crontabDocument->childs = array_filter($crontabDocument->childs, function ($element) use ($file)
         {
-            if (is_a($element, \Dcp\CrontabSectionElement::class))
-            {
+            if (is_a($element, '\Dcp\CrontabSectionElement')) {
                 /**
                  * @var $element \Dcp\CrontabSectionElement
                  */
@@ -164,8 +163,7 @@ class Crontab
         /* Remove existing sections for this context/file */
         $crontabDocument->childs = array_filter($crontabDocument->childs, function (\Dcp\CrontabElement & $element) use ($file)
         {
-            if (is_a($element, \Dcp\CrontabSectionElement::class))
-            {
+            if (is_a($element, '\Dcp\CrontabSectionElement')) {
                 /**
                  * @var $element \Dcp\CrontabSectionElement
                  */
@@ -227,8 +225,7 @@ class Crontab
             /**
              * @var $element \Dcp\CrontabSectionElement
              */
-            if (is_a($element, \Dcp\CrontabSectionElement::class) && $element->matchContextRoot(DEFAULT_PUBDIR))
-            {
+            if (is_a($element, '\Dcp\CrontabSectionElement') && $element->matchContextRoot(DEFAULT_PUBDIR)) {
                 array_push($crontabs, array(
                     'file' => $element->file,
                     'content' => (string)$element
@@ -255,8 +252,7 @@ class Crontab
         /* Remove existing sections for this context */
         $crontabDocument->childs = array_filter($crontabDocument->childs, function (\Dcp\CrontabElement & $element)
         {
-            if (is_a($element, \Dcp\CrontabSectionElement::class))
-            {
+            if (is_a($element, '\Dcp\CrontabSectionElement')) {
                 /**
                  * @var $element \Dcp\CrontabSectionElement
                  */
