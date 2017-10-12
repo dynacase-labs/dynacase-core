@@ -9,8 +9,7 @@ class CrontabDocument extends CrontabElement
         /* Coalesce empty text elements */
         $elements = array_filter($this->childs, function ($currentElement) use (&$previousElement)
         {
-            if ($previousElement !== null && is_a($previousElement, CrontabTextElement::class) && is_a($currentElement, CrontabTextElement::class))
-            {
+            if ($previousElement !== null && is_a($previousElement, '\Dcp\CrontabTextElement') && is_a($currentElement, '\Dcp\CrontabTextElement')) {
                 if (strlen((string)$previousElement) <= 0 && strlen((string)$currentElement) <= 0) {
                     return false;
                 }
