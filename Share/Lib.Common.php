@@ -134,15 +134,17 @@ function getMailAddr($userid, $full = false)
 {
     $user = new Account("", $userid);
     
-    if ($user->isAffected()) {
-        $pren = $postn = "";
-        if ($full) {
-            $pren = '"' . trim(str_replace('"', '-', ucwords(strtolower($user->getDisplayName($user->id))))) . '" <';
-            $postn = '>';
-        }
-        return $pren . $user->getMail() . $postn;
+    if (!$user->isAffected()) {
+        return false;
     }
-    return false;
+    $mailAddr = $user->getMail();
+    if ($full && $mailAddr !== '') {
+        /* Compose full address iif the user has a non-empty mail address */
+        $pren = '"' . trim(str_replace('"', '-', ucwords(strtolower($user->getDisplayName($user->id))))) . '" <';
+        $postn = '>';
+        return $pren . $mailAddr . $postn;
+    }
+    return $mailAddr;
 }
 
 function getTmpDir($def = '/tmp')

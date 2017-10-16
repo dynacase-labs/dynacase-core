@@ -320,8 +320,18 @@ class Message
                     }
                     /* Set envelope sender */
                     $this->setSender($sender->address);
-                    /* Overwrite original "From:" with envelope sender address while keeping original display name */
-                    $this->setFrom(new Address($sender->address, $this->from->name));
+                    if ($sender->name === '') {
+                        /*
+                         * Overwrite original "From:" with envelope sender address while keeping original display name
+                        */
+                        $this->setFrom(new Address($sender->address, $this->from->name));
+                    } else {
+                        /*
+                         * Overwrite original "From:" with envelope sender address while keeping original display name
+                         * and showing sender's display name in "via" suffix
+                        */
+                        $this->setFrom(new Address($sender->address, sprintf("%s via %s", $this->from->name, $sender->name)));
+                    }
                 }
             }
         }
