@@ -477,14 +477,18 @@ class MailTemplate extends \Dcp\Family\Document
             "cc",
             "bcc"
         ) as $td) {
-            foreach ($dests[$td] as $kDest => $aDest) {
+            if (!isset($dests[$td])) {
+                continue;
+            }
+            foreach ($dests[$td] as & $aDest) {
                 foreach ($substituteMails as $aSumail) {
                     $suName = str_replace('"', '', sprintf(_("%s (as substitute)") , $aSumail["suname"]));
-                    $dests[$td][$kDest] = str_replace(sprintf('<%s>', $aSumail["inmail"]) , sprintf('<%s>, "%s" <%s>', $aSumail["inmail"], $suName, $aSumail["sumail"]) , $aDest);
+                    $aDest = str_replace(sprintf('<%s>', $aSumail["inmail"]) , sprintf('<%s>, "%s" <%s>', $aSumail["inmail"], $suName, $aSumail["sumail"]) , $aDest);
                     
-                    $dests[$td][$kDest] = preg_replace(sprintf('/(^|,|\s)(%s)/', preg_quote($aSumail["inmail"], "/")) , sprintf('\1\2, "%s" <%s>', $suName, $aSumail["sumail"]) , $dests[$td][$kDest]);
+                    $aDest = preg_replace(sprintf('/(^|,|\s)(%s)/', preg_quote($aSumail["inmail"], "/")) , sprintf('\1\2, "%s" <%s>', $suName, $aSumail["sumail"]) , $aDest);
                 }
             }
+            unset($aDest);
         }
     }
     
