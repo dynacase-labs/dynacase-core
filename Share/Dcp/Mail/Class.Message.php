@@ -136,6 +136,55 @@ class Message
             }
         }
     }
+
+    /**
+     * Get To email addresses
+     * @return string
+     */
+    public function getTo() {
+        return $this->addressesToString($this->to);
+    }
+
+    /**
+     * Get Cc email addresses
+     * @return string
+     */
+    public function getCC() {
+        return $this->addressesToString($this->cc);
+    }
+    /**
+     * Get Bcc email addresses
+     * @return string
+     */
+    public function getBCC() {
+        return $this->addressesToString($this->bcc);
+    }
+    /**
+     * Get From email address
+     * @return string
+     */
+    public function getFrom() {
+        return $this->addressesToString([$this->from]);
+    }
+    /**
+     * @param Address[] $tAddresses
+     *
+     * @return string
+     */
+    protected function addressesToString(array $tAddresses) {
+        $tos=[];
+        foreach ($tAddresses as $to) {
+            if ($to->address) {
+                if ($to->name) {
+                    $tos[] = sprintf('"%s" <%s>', str_replace('"', ' ', $to->name), $to->address);
+                } else {
+                    $tos[] =$to->address;
+                }
+            }
+        }
+        return implode(",", $tos);
+    }
+
     /**
      * Add 'To:' recipients.
      *

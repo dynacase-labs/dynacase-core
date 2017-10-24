@@ -32,7 +32,7 @@ class MailTemplate extends \Dcp\Family\Document
     public $keys = array();
     
     protected $notifySendMail = self::NOTIFY_SENDMAIL_AUTO;
-    
+    protected $stopIfNoRecip = false;
     function preEdition()
     {
         global $action;
@@ -70,28 +70,24 @@ class MailTemplate extends \Dcp\Family\Document
         if (!array_key_exists($lattrid, $doc)) return sprintf(_("Send mail error : Attribute %s not found.") , $lattrid);
         return "";
     }
+
     /**
-     * send document by email using this template
-     * @param \Doc $doc document to send
-     * @param array $keys extra keys used for template
-     * @return string error - empty if no error -
+     * @param \Doc  $doc Document to use for complete mail
+     * @param array $keys extra keys to complete mail body or subject
+     *
+     * @return \Dcp\Mail\Message (return null if no recipients)
+     * @throws \Dcp\Exception
      */
-    public function sendDocument(\Doc & $doc, $keys = array())
+    public function getMailMessage(\Doc & $doc, $keys = array())
     {
+
         global $action;
-        
-        include_once ("FDL/sendmail.php");
-        include_once ("FDL/Lib.Vault.php");
-        $err = '';
-        if (!$doc->isAffected()) {
-            return $err;
-        }
         $this->keys = $keys;
-        
+
         $message = new \Dcp\Mail\Message();
-        
+
         $tdest = $this->getArrayRawValues("tmail_dest");
-        
+
         $dest = array(
             "to" => array() ,
             "cc" => array() ,
@@ -129,7 +125,7 @@ class MailTemplate extends \Dcp\Family\Document
                     if ($err) {
                         $action->log->error($err);
                         $doc->addHistoryEntry($err);
-                        return $err;
+                        throw new \Dcp\Exception($err);
                     }
                     $mail = $doc->getRValue($aid);
                     break;
@@ -141,7 +137,7 @@ class MailTemplate extends \Dcp\Family\Document
                         if ($err) {
                             $action->log->error($err);
                             $wdoc->addHistoryEntry($err);
-                            return $err;
+                            throw new \Dcp\Exception($err);
                         }
                         $mail = $wdoc->getRValue($aid);
                     }
@@ -152,7 +148,7 @@ class MailTemplate extends \Dcp\Family\Document
                     if (!$doc->getAttribute($aid)) {
                         $action->log->error(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
                         $doc->addHistoryEntry(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
-                        return sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid);
+                        throw new \Dcp\Exception(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
                     }
                     $mail = $doc->getFamilyParameterValue($aid);
                     break;
@@ -163,16 +159,16 @@ class MailTemplate extends \Dcp\Family\Document
                         if (!$wdoc->getAttribute($aid)) {
                             $action->log->error(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
                             $wdoc->addHistoryEntry(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
-                            return sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid);
+                            throw new \Dcp\Exception(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
                         }
                         $mail = $wdoc->getFamilyParameterValue($aid);
                     }
                     break;
 
                 case 'DE': // param user relation
-                    
+
                 case 'D': // user relations
-                    
+
                 case 'WD': // user relations
                     if ($type == 'D' || $type == 'DE') {
                         $udoc = $doc;
@@ -184,13 +180,13 @@ class MailTemplate extends \Dcp\Family\Document
                         if (!$udoc->getAttribute($aid) && !array_key_exists(strtolower($aid) , $udoc->getParamAttributes())) {
                             $action->log->error(sprintf(_("Send mail error : Attribute %s not found") , $aid));
                             $doc->addHistoryEntry(sprintf(_("Send mail error : Attribute %s not found") , $aid));
-                            return sprintf(_("Send mail error : Attribute %s not found") , $aid);
+                            throw new \Dcp\Exception(sprintf(_("Send mail error : Attribute %s not found") , $aid));
                         }
                         if ($type == 'DE') {
                             $vdocid = $udoc->getFamilyParameterValue($aid);
                         } else {
                             $vdocid = $udoc->getRawValue($aid); // for array of users
-                            
+
                         }
                         $vdocid = str_replace('<BR>', "\n", $vdocid);
                         if (strpos($vdocid, "\n")) {
@@ -252,7 +248,7 @@ class MailTemplate extends \Dcp\Family\Document
                     if (!getParam($aid)) {
                         $action->log->error(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
                         $doc->addHistoryEntry(sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
-                        return sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid);
+                        throw new \Dcp\Exception( sprintf(_("Send mail error : Parameter %s doesn't exists") , $aid));
                     }
                     $mail = getParam($aid);
                     break;
@@ -273,13 +269,13 @@ class MailTemplate extends \Dcp\Family\Document
                         $err = sprintf(_("Send mail error: recipient document '%s' does not exists.") , $recipDocId);
                         $action->log->error($err);
                         $doc->addHistoryEntry($err);
-                        return $err;
+                        throw new \Dcp\Exception($err);
                     }
                     if (!is_a($recipientDoc, 'IMailRecipient')) {
                         $err = sprintf(_("Send mail error: recipient document '%s' does not implements IMailRecipient interface.") , $recipDocId);
                         $action->log->error($err);
                         $doc->addHistoryEntry($err);
-                        return $err;
+                        throw new \Dcp\Exception($err);
                     }
                     $mail = $recipientDoc->getMail();
                     break;
@@ -308,9 +304,9 @@ class MailTemplate extends \Dcp\Family\Document
         $dest['cc'] = array_filter($dest['cc'], create_function('$v', 'return!preg_match("/^\s*$/", $v);'));
         $dest['bcc'] = array_filter($dest['bcc'], create_function('$v', 'return!preg_match("/^\s*$/", $v);'));
         $dest['from'] = array_filter($dest['from'], create_function('$v', 'return!preg_match("/^\s*$/", $v);'));
-        
+
         $this->addSubstitutes($dest);
-        
+
         $to = implode(',', $dest['to']);
         $cc = implode(',', $dest['cc']);
         $bcc = implode(',', $dest['bcc']);
@@ -324,17 +320,19 @@ class MailTemplate extends \Dcp\Family\Document
         if ($from == "") {
             $from = $action->user->login . '@' . (isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : "");
         }
-        
+
         if (trim($to . $cc . $bcc) == "") {
             $action->log->info(sprintf(_("Send mail info : can't send mail %s: no sendee found") , $subject));
             $doc->addHistoryEntry(sprintf(_("Send mail info : can't send mail %s: no sendee found") , $subject) , HISTO_NOTICE);
-            return "";
+            if ($this->stopIfNoRecip) {
+                return null;
+            }
         } //nobody to send data
         if ($this->sendercopy && getParam("FDL_BCC") == "yes") {
             $umail = getMailAddr($this->userid);
             if ($umail != "") $bcc.= (trim($bcc) == "" ? "" : ",") . $umail;
         }
-        
+
         $body = new \Dcp\Mail\Body($pfout, 'text/html');
         $message->setBody($body);
         // ---------------------------
@@ -351,7 +349,7 @@ class MailTemplate extends \Dcp\Family\Document
             if ($err) {
                 $action->log->error($err);
                 $doc->addHistoryEntry($err);
-                return $err;
+                throw new \Dcp\Exception($err);
             }
             $vf = $doc->getRValue(strtok($v, " "));
             if ($vf) {
@@ -374,8 +372,44 @@ class MailTemplate extends \Dcp\Family\Document
         $message->addCc($cc);
         $message->addBcc($bcc);
         $message->setSubject($subject);
-        $err = $message->send();
+        return $message;
+    }
+
+    /**
+     * send document by email using this template
+     * @param \Doc $doc document to send
+     * @param array $keys extra keys used for template
+     * @return string error - empty if no error -
+     */
+    public function sendDocument(\Doc & $doc, $keys = array())
+    {
+        global $action;
         
+        include_once ("FDL/sendmail.php");
+        include_once ("FDL/Lib.Vault.php");
+        $err = '';
+        if (!$doc->isAffected()) {
+            return $err;
+        }
+
+        try {
+            $this->stopIfNoRecip=true;
+            $message = $this->getMailMessage($doc, $keys);
+            if (!$message) {
+                return "";
+            }
+            $this->stopIfNoRecip=false;
+        } catch (\Exception $e) {
+            $this->stopIfNoRecip=false;
+            return $e->getMessage();
+        }
+        $err = $message->send();
+
+        $to = $message->getTo();
+        $cc = $message->getCc();
+        $bcc = $message->getBCC();
+        $subject=$message->subject;
+        $from=$message->getFrom();
         $savecopy = $this->getRawValue("tmail_savecopy") == "yes";
         if (($err == "") && $savecopy) {
             createSentMessage($to, $from, $cc, $bcc, $subject, $message, $doc);
