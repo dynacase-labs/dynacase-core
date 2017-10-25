@@ -14,5 +14,7 @@ $(pubdir)/$(appname)/mime.conf: mime.conf $(pubdir)/$(appname)
 	cp $< $@
 $(pubdir)/$(appname)/mime-user.conf.sample: mime-user.conf.sample $(pubdir)/$(appname)
 	cp $< $@
+$(pubdir)/$(appname)/file-mime.xml: file-mime.xml $(pubdir)/$(appname)
+	cp $< $@
 
-publish:  $(pubdir)/$(appname)/dbaccess.php.in $(pubdir)/$(appname)/local-dbaccess.php.sample $(pubdir)/$(appname)/mime.conf $(pubdir)/$(appname)/mime-user.conf.sample
+publish:  $(pubdir)/$(appname)/dbaccess.php.in $(pubdir)/$(appname)/local-dbaccess.php.sample $(pubdir)/$(appname)/mime.conf $(pubdir)/$(appname)/mime-user.conf.sample $(pubdir)/$(appname)/file-mime.xml

@@ -206,6 +206,7 @@ function Http_Download($src, $ext, $name, $add_ext = TRUE, $mime_type = "")
     header("Pragma: "); // HTTP 1.0
     header("Content-Disposition: attachment;filename=\"$uName\";filename*=UTF-8''$name;");
     header("Content-type: " . $mime_type);
+    header("X-Content-Type-Options: nosniff");
     echo $src;
 }
 /**
@@ -223,6 +224,8 @@ function Http_Download($src, $ext, $name, $add_ext = TRUE, $mime_type = "")
  */
 function Http_DownloadFile($filename, $name, $mime_type = '', $inline = false, $cache = true, $deleteafter = false)
 {
+    require_once 'FDL/Class.FileMimeConfig.php';
+    
     if (!file_exists($filename)) {
         printf(_("file not found : %s") , $filename);
         return;
@@ -233,6 +236,11 @@ function Http_DownloadFile($filename, $name, $mime_type = '', $inline = false, $
         $name = str_replace('"', '-', $name);
         $uName = iconv("UTF-8", "ASCII//TRANSLIT", $name);
         $name = rawurlencode($name);
+        $fileMimeConfig = new \Dcp\FileMimeConfig();
+        if ($inline && !$fileMimeConfig->isInlineAllowed($mime_type)) {
+            /* Override requested inline mode as it is forbidden */
+            $inline = false;
+        }
         if (!$inline) {
             header("Content-Disposition: attachment;filename=\"$uName\";filename*=UTF-8''$name;");
         } else {
@@ -251,6 +259,7 @@ function Http_DownloadFile($filename, $name, $mime_type = '', $inline = false, $
         if ($inline && substr($mime_type, 0, 4) == "text" && substr($mime_type, 0, 9) != "text/html" && substr($mime_type, 0, 8) != "text/xml") $mime_type = preg_replace("_text/([^;]*)_", "text/plain", $mime_type);
         
         header("Content-type: " . $mime_type);
+        header("X-Content-Type-Options: nosniff");
         header("Content-Transfer-Encoding: binary");
         header("Content-Length: " . filesize($filename));
         $buflen = ob_get_length();
@@ -298,4 +307,5 @@ function setHeaderCache($mime = "text/css")
     header("Expires: " . gmdate("D, d M Y H:i:s T\n", time() + $duration)); // for mozilla
     header("Pragma: none"); // HTTP 1.0
     header("Content-type: $mime");
+    header("X-Content-Type-Options: nosniff");
 }
