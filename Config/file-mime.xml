@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rules>
+  <inline>
+    <!--
+    Rules are evaluated by MIME type specificity (from most specific to least specific).
+
+    'type' values must follow the following forms:
+    - [type] . "/" . [subtype]: match given type and subtype.
+    - [type] . "/*": match given type only.
+    - "*/*": match any type or subtype.
+    -->
+    <deny type="text/html" comment="HTML" />
+    <deny type="application/xhtml+xml" comment="XHTML" />
+    <deny type="image/svg" comment="SVG" />
+    <deny type="image/svg+xml" comment="SVG" />
+    <deny type="application/hta" comment="Microsoft HTML Application" />
+    <deny type="application/x-xpinstall" comment="Mozilla XPI extensions" />
+    <deny type="application/vnd.mozilla.xul+xml" comment="Mozilla XUL" />
+    <deny type="application/x-shockwave-flash" comment="Adobe Flash" />
+    <allow type="*/*" />
+  </inline>
+</rules>
