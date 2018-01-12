@@ -408,6 +408,13 @@ $app_const = array(
         "descr" => N_("WSH error mail subject") ,
         "user" => "N",
         "global" => "Y"
+    ),
+    "CORE_DISPLAY_ERROR" => array(
+        "val" => "no",
+        "descr" => N_("Display errors in request response") ,
+        "user" => "N",
+        "kind" => "enum(yes|no)",
+        "global" => "Y"
     )
 );
 

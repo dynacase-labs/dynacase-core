@@ -250,7 +250,10 @@ function getSessionValue($name, $def = "")
 function getCurrentUser()
 {
     global $action;
-    return $action->user;
+    if ($action) {
+        return $action->user;
+    }
+    return null;
 }
 function getLayoutFile($app, $layfile)
 {
@@ -334,12 +337,18 @@ function getDebugStack($slice = 1)
  * @param int $slice
  * @return void
  */
-function logDebugStack($slice = 1)
+function logDebugStack($slice = 1, $msg = "")
 {
     $st = getDebugStack(2);
-    foreach ($st as $k => $t) {
-        error_log(sprintf('%d) %s:%s %s::%s()', $k, isset($t["file"]) ? $t["file"] : 'closure', isset($t["line"]) ? $t["line"] : 0, isset($t["class"]) ? $t["class"] : '', $t["function"]));
+    $errors = [];
+    if ($msg) {
+        $errors[] = $msg;
     }
+    foreach ($st as $k => $t) {
+        $errors[] = sprintf('%d) %s:%s %s::%s()', $k, isset($t["file"]) ? $t["file"] : 'closure', isset($t["line"]) ? $t["line"] : 0, isset($t["class"]) ? $t["class"] : '', $t["function"]);
+    }
+    
+    error_log(implode("\n", $errors));
 }
 function getDbid($dbaccess)
 {
@@ -516,14 +525,14 @@ function simpleQuery($dbaccess, $query, &$result = array() , $singlecolumn = fal
         $err = ErrorCode::getError('DB0102', $dbaccess, $err, $query);
     }
     if ($err) {
-        logDebugStack();
-        error_log($err);
+        
         if ($useStrict !== false) {
             if ($sqlStrict === null) $sqlStrict = (getParam("CORE_SQLSTRICT") != "no");
             if ($useStrict === true || $sqlStrict) {
                 throw new \Dcp\Db\Exception($err);
             }
         }
+        logDebugStack(-1, $err);
     }
     
     return $err;

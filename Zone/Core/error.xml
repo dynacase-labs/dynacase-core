@@ -1,53 +1,58 @@
+<!DOCTYPE html>
 <html>
-  <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<LINK REL="icon" HREF="[DYNACASE_FAVICO]" >
-<LINK REL="SHORTCUT ICON" HREF="[DYNACASE_FAVICO]" >
-<LINK REL="stylesheet" type="text/css" HREF="?app=CORE&action=CORE_CSS" >
-   <title>[TITLE]</title>
-[CSS:REF]
-   <style type="text/css">
-[CSS:CODE]
-   </style>
+        <LINK REL="icon" HREF="[DYNACASE_FAVICO]"/>
+        <LINK REL="SHORTCUT ICON" HREF="[DYNACASE_FAVICO]"/>
+        <title>[TITLE]</title>
 
-      [JS:REF]
-         <script language="JavaScript">
-        <!--
-          [JS:CODE]
-        //-->
-         </script>
- </head>
+        <style type="text/css">
+            html {
+                font-size: 16px;
+            }
+            body {
+              font-family: sans-serif;
+              margin:0;
+            }
+            .text-error {
+                margin-left:auto;
+                margin-right:auto;
+                width:80%;
+                text-align:left;
+                font-weight: bold;
+                word-break: break-word;
+            }
+            .container-error {
+                background: #b0413e;
+                color: white;
+                margin:0;
+                border: none;
+                padding: 2rem 1rem;
+            }
+            .code {
+               font-family: monospace;
+                font-size: 0.8rem;
+               float:right;
+            }
+        </style>
 
-<body class="core">
-<script language="javascript">
+    </head>
 
-if (window.name == 'fhidden' || window.innerWidth == 0 || window.document.body.clientWidth == 0) {
-  alert([serror]);
-}
+    <body class="core">
+        <script language="javascript">
 
-</script>
-<style>
-div.error {
-  color:[CORE_ERRORCOLOR];
-  margin-left:auto;
-  margin-right:auto;
-  width:80%;
-  text-align:left;
-}
-div.COREError {
-    margin:10px;
-    border: solid 3px;
-}
-</style>
-<div  class="COREError" >
+            if (window.name == 'fhidden' || window.innerWidth == 0 || window.document.body.clientWidth == 0) {
+            alert([serror]);
+            }
 
-<div class="CoreTextError" title="[appname]/[appact]">
-<div class="error">[error]</div>
-<div>
+        </script>
+        <div class="container-error">
+            <div class="section-error" title="[appname]/[appact]">
+                <div class="text-error">[error] <span class="code">[code]</span> </div>
+        </div>
 
 
-
-
-</div>
-    </body></html>
+        </div>
+    </body>
+</html>
