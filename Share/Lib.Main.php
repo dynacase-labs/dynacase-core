@@ -27,9 +27,6 @@ function getMainAction($auth, &$action)
     include_once ('Lib.Phpini.php');
     include_once ('Class.Log.php');
     include_once ('Class.DbObj.php');
-    $indexphp = basename($_SERVER["SCRIPT_NAME"]);
-    
-    $log = new Log("", $indexphp);
     
     $CoreNull = "";
     
@@ -69,10 +66,9 @@ function getMainAction($auth, &$action)
     if ($defaultapp && $core->GetParam("CORE_START_APP")) {
         $_GET["app"] = $core->GetParam("CORE_START_APP");
     }
-
+    
     \Dcp\Core\LibPhpini::setCoreApplication($core);
     \Dcp\Core\LibPhpini::applyLimits();
-
     //$core->SetSession($session);
     // ----------------------------------------
     // Init PUBLISH URL from script name
@@ -406,24 +402,26 @@ function handleActionException($e)
             header("HTTP/1.1 500 Dynacase Uncaught Exception");
         }
     }
-    errorLogException($e);
+    
+    $displayMsg = \Dcp\Core\LogException::logMessage($e, $errId);
     if (isset($action) && is_a($action, 'Action') && isset($action->parent)) {
         
         if ($action->parent->name === ApplicationParameterManager::getParameterValue("CORE", "CORE_START_APP")) {
             $action->parent->session->Close();
             $action->exitError(_("You don't have access to any content. Please contact your administrator."));
         } else {
+            
             if (php_sapi_name() === 'cli') {
-                fwrite(STDERR, $e->getMessage() . "\n");
+                fwrite(STDERR, sprintf("[%s]: %s\n", $errId, $displayMsg));
             } else {
-                $action->exitError($e->getMessage());
+                $action->exitError($displayMsg, true, $errId);
             }
         }
     } else {
         if (php_sapi_name() === 'cli') {
-            fwrite(STDERR, $e->getMessage());
+            fwrite(STDERR, $displayMsg);
         } else {
-            print htmlspecialchars($e->getMessage());
+            print htmlspecialchars($displayMsg);
         }
         exit(1);
     }
@@ -448,7 +446,6 @@ function _wsh_send_error($errMsg, $expand = array())
     $wshError->addExpand($expand);
     $wshError->autosend();
 }
-
 /**
  * Handle exceptions by logging errors or by sending mails
  * depending if the program is used in a CLI or not.
@@ -460,12 +457,12 @@ function _wsh_send_error($errMsg, $expand = array())
 function _wsh_exception_handler($e, $callStack = true)
 {
     if ($callStack === true) {
-        $errMsg = formatErrorLogException($e);
+        $errMsg = \Dcp\Core\LogException::formatErrorLogException($e);
         error_log($errMsg);
     } else {
         $errMsg = $e->getMessage();
     }
-
+    
     if (!isInteractiveCLI()) {
         $expand = array(
             'm' => preg_replace('/^([^\n]*).*/s', '\1', $e->getMessage())
@@ -545,43 +542,48 @@ function enable_wsh_safetybelts()
 }
 /**
  * @param Throwable $e
+ * @deprecated use Dcp\Core\LogException::formatErrorLogException()
  * @return string
  */
 function formatErrorLogException($e)
 {
-    global $argv;
-    
-    $pid = getmypid();
-    $err = sprintf("%s> Dynacase got an uncaught exception '%s' with message '%s' in file %s at line %s:", $pid, get_class($e) , $e->getMessage() , $e->getFile() , $e->getLine());
-    if (php_sapi_name() == 'cli' && is_array($argv)) {
-        $err.= sprintf("\n%s> Command line arguments: %s", $pid, join(' ', array_map("escapeshellarg", $argv)));
-        $err.= sprintf("\n%s> error_log: %s", $pid, ini_get('error_log'));
-    }
-    foreach (preg_split('/\n/', $e->getTraceAsString()) as $line) {
-        $err.= sprintf("\n%s> %s", $pid, $line);
-    }
-    $err.= sprintf("\n%s> End Of Exception.", $pid);
-    return $err;
+    return \Dcp\Core\LogException::formatErrorLogException($e);
 }
 /**
  * @param Exception|Error  $e
  */
 function errorLogException($e)
 {
-    error_log(formatErrorLogException($e));
+    \Dcp\Core\LogException::writeLog($e);
 }
 
 function handleFatalShutdown()
 {
     global $action;
+    
     $error = error_get_last();
+    
     if ($error !== NULL && $action) {
-        if ($error["type"] == E_ERROR) {
+        
+        if (in_array($error["type"], array(
+            E_ERROR,
+            E_PARSE,
+            E_COMPILE_ERROR,
+            E_CORE_ERROR,
+            E_USER_ERROR,
+            E_RECOVERABLE_ERROR
+        ))) {
             ob_get_clean();
             if (!headers_sent()) {
                 header("HTTP/1.1 500 Dynacase Fatal Error");
             }
-            $action->exitError($error["message"], false);
+            
+            $displayMsg = \Dcp\Core\LogException::logMessage($error, $errId);
+            if ($action) {
+                $action->exitError($displayMsg, false, $errId);
+            } else {
+                print $displayMsg;
+            }
             // Fatal error are already logged by PHP
             
         }

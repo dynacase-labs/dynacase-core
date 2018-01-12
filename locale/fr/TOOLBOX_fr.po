@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Platform\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-06 16:47+0200\n"
-"PO-Revision-Date: 2017-02-02 09:03+0100\n"
+"POT-Creation-Date: 2018-01-12 09:06+0100\n"
+"PO-Revision-Date: 2018-01-11 17:40+0100\n"
 "Last-Translator: Matthieu Codron <matthieu.codron+dev@anakeen.com>\n"
 "Language-Team: français <>\n"
 "Language: fr\n"
@@ -1097,9 +1097,6 @@ msgid "Click on attribute to modify <b>{{aid}}</b> default value"
 msgstr ""
 "Cliquer pour modifier la valeur par défaut de l'attribut <b>{{aid}}</b>"
 
-msgid "Click to access to the document"
-msgstr "Cliquer pour accéder au document"
-
 msgid "Click to clear button to change value"
 msgstr "Cliquer sur le bouton 'x' pour changer la valeur"
 
@@ -1404,6 +1401,9 @@ msgstr "Répertoire déjà existant"
 
 msgid "Display available choices"
 msgstr "Afficher les choix possibles"
+
+msgid "Display errors in request response"
+msgstr ""
 
 msgid "Do choice"
 msgstr "Choisissez"
@@ -1834,14 +1834,6 @@ msgstr "Erreur : Processus %s [%d]: statut %d"
 #, php-format
 msgid "Error : Process %s [%d]: status %d in %.03f seconds"
 msgstr "Erreur : Processus %s [%d]: statut %d en %.03f secondes"
-
-#, php-format
-msgid "Error : User [%s] doesn't exists\n"
-msgstr "Erreur : L'utilisateur %s n'existe pas\n"
-
-#, php-format
-msgid "Error : User account [%s] is desactivated\n"
-msgstr "Erreur : Le compte de l'utilisateur %s est désactivé\n"
 
 #, php-format
 msgid "Error : need edit privilege to execute"
@@ -3780,14 +3772,14 @@ msgstr "Nom du serveur SMTP"
 msgid "SMTP login"
 msgstr "Nom d'utilisateur pour la connexion SMTP"
 
-msgid "SMTP sender"
-msgstr "Adresse système pour l'envoi de mail"
-
 msgid "SMTP password"
 msgstr "Mot de passe pour la connexion SMTP"
 
 msgid "SMTP port"
 msgstr "Numéro de port de la connexion SMTP"
+
+msgid "SMTP sender"
+msgstr "Adresse système pour l'envoi de mail"
 
 msgctxt "authent"
 msgid "SMTP server not configured"
@@ -4370,6 +4362,10 @@ msgstr "Désarchivé depuis %s"
 msgid "Undirected graphs"
 msgstr "Graphe non-directionnel"
 
+msgctxt "dcp"
+msgid "Unexpected error"
+msgstr ""
+
 #, php-format
 msgid "Unexpected transition error on workflow %s [%d] : %s"
 msgstr "Erreur de transition sur le cycle %s [%d] : %s"
@@ -4634,6 +4630,10 @@ msgstr "Système de fichiers WebDAV DYNACASE"
 
 msgid "Wednesday"
 msgstr "Mercredi"
+
+msgctxt "dcp"
+msgid "Whoops, looks like something went wrong"
+msgstr "Aïe aïe aïe, on dirait que quelque chose s'est mal passé"
 
 msgid "With States and activities"
 msgstr "Avec états et activités"
@@ -9216,6 +9216,9 @@ msgstr "le titre de {left} inclus {right}"
 #~ msgid "Click here to logout"
 #~ msgstr "Cliquer ici pour se déconnecter"
 
+#~ msgid "Click to access to the document"
+#~ msgstr "Cliquer pour accéder au document"
+
 #~ msgid "Column mode"
 #~ msgstr "Mode colonne"
 
@@ -9251,6 +9254,12 @@ msgstr "le titre de {left} inclus {right}"
 #~ msgstr ""
 #~ "L'élément ne peut pas être parfaitement analysé, des erreurs peuvent "
 #~ "apparaître lors de l'importation"
+
+#~ msgid "Error : User [%s] doesn't exists\n"
+#~ msgstr "Erreur : L'utilisateur %s n'existe pas\n"
+
+#~ msgid "Error : User account [%s] is desactivated\n"
+#~ msgstr "Erreur : Le compte de l'utilisateur %s est désactivé\n"
 
 #~ msgid "Error converting HTML from attribute '%s' from document '%s'"
 #~ msgstr "Erreur de conversion du HTML de l'attribut '%s' du document '%s'"

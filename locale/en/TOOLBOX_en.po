@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Toolbox\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-06 16:47+0200\n"
+"POT-Creation-Date: 2018-01-12 09:06+0100\n"
 "PO-Revision-Date: 2016-11-18 15:26+0100\n"
 "Last-Translator: Matthieu Codron <matthieu.codron+dev@anakeen.com>\n"
 "Language-Team: English team <>\n"
@@ -1070,9 +1070,6 @@ msgstr ""
 msgid "Click on attribute to modify <b>{{aid}}</b> default value"
 msgstr ""
 
-msgid "Click to access to the document"
-msgstr ""
-
 msgid "Click to clear button to change value"
 msgstr ""
 
@@ -1370,6 +1367,9 @@ msgid "Directory already exists"
 msgstr ""
 
 msgid "Display available choices"
+msgstr ""
+
+msgid "Display errors in request response"
 msgstr ""
 
 msgid "Do choice"
@@ -1777,14 +1777,6 @@ msgstr ""
 
 #, php-format
 msgid "Error : Process %s [%d]: status %d in %.03f seconds"
-msgstr ""
-
-#, php-format
-msgid "Error : User [%s] doesn't exists\n"
-msgstr ""
-
-#, php-format
-msgid "Error : User account [%s] is desactivated\n"
 msgstr ""
 
 #, php-format
@@ -3626,13 +3618,13 @@ msgstr ""
 msgid "SMTP login"
 msgstr ""
 
-msgid "SMTP sender"
-msgstr ""
-
 msgid "SMTP password"
 msgstr ""
 
 msgid "SMTP port"
+msgstr ""
+
+msgid "SMTP sender"
 msgstr ""
 
 msgctxt "authent"
@@ -4180,6 +4172,10 @@ msgstr ""
 msgid "Undirected graphs"
 msgstr ""
 
+msgctxt "dcp"
+msgid "Unexpected error"
+msgstr ""
+
 #, php-format
 msgid "Unexpected transition error on workflow %s [%d] : %s"
 msgstr ""
@@ -4435,6 +4431,10 @@ msgid "WebDav FREEDOM system file"
 msgstr "Dynacase WebDAV file system"
 
 msgid "Wednesday"
+msgstr ""
+
+msgctxt "dcp"
+msgid "Whoops, looks like something went wrong"
 msgstr ""
 
 msgid "With States and activities"

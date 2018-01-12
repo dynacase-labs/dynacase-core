@@ -819,11 +819,11 @@ class DbObj
         if ($moreerr == '') $err = $this->msg_err;
         $err = $this->msg_err . "\n" . $moreerr . "\n";
         
-        logDebugStack(2);
-        error_log($err);
         if (self::$sqlStrict) {
             throw new Dcp\Db\Exception($err);
         }
+        
+        logDebugStack(2, $err);
     }
     /**
      * @deprecated not used now
