@@ -56,6 +56,29 @@ class TestAttributeOrder extends TestCaseDcpCommonFamily
             $k++;
         }
     }
+    /**
+     * @dataProvider dataOptAttribute
+     * @return \Doc
+     */
+    public function testOptAttribute($family, $expectedOpts) {
+        /**
+         * @var \DocFam $fam
+         */
+        $fam = new_doc(self::$dbaccess, $family);
+        $this->assertTrue($fam->isAlive() , sprintf("family %s not alive", $family));
+
+        foreach ($expectedOpts as $attrid=>$opts) {
+            $attr=$fam->getAttribute($attrid);
+            $this->assertNotEmpty($attr, "Attribute $attrid not exists");
+            foreach ($opts as $kopt=>$opt) {
+                $this->assertEquals($opt, $attr->getOption($kopt),
+                    sprintf("Verify \"%s\" on \"%s\". Has : %s", $kopt, $attrid,
+                        print_r($attr->getOptions(), true)));
+            }
+        }
+
+    }
+
     public function dataOrderAttribute()
     {
         $aOrder = array(
@@ -250,6 +273,42 @@ class TestAttributeOrder extends TestCaseDcpCommonFamily
             array(
                 "TST_ORDERNUME",
                 $eOrder
+            )
+        );
+    }
+
+    public function dataOptAttribute()
+    {
+        return array(
+            array(
+                "TST_ORDERAUTOA",
+                [
+                    "TST_A2000" => ["customopt" => "2000"],
+                    "TST_AF9000" => ["customopt" => "9000"]
+                ]
+            ),
+            array(
+                "TST_ORDERAUTOB",
+                [
+                    "TST_A2000" => ["customopt" => "2000"],
+                    "TST_AF9000" => ["customopt" => "9000"],
+                    "TST_B600" => ["customopt" => "600"],
+                ]
+            ),
+            array(
+                "TST_ORDERAUTOC",
+                [
+                    "TST_A2000" => ["customopt" => "2000"],
+                    "TST_AF9000" => ["customopt" => "9000"],
+                    "TST_B600" => ["customoptbis" => "600", "customopt"=> "600"],
+                ]
+            ),
+            array(
+                "TST_ORDERAUTOD",
+                [
+                    "TST_A2000" => ["customoptbis" => "2000", "customopt"=> ""],
+                    "TST_AF9000" => ["customopt" => "9000"]
+                ]
             )
         );
     }
