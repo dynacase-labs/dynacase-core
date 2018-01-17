@@ -909,8 +909,18 @@ class FamilyImport
             return $ta;
         } else {
             $tw = $ta;
-            
+
             foreach ($tas as $ta1) {
+                if (preg_match("/(.*)relativeOrder=([A-Za-z0-9_:-]+)(.*)/", $ta->options, $attrReg)) {
+                    if (preg_match("/(.*)relativeOrder=([A-Za-z0-9_:-]+)(.*)/", $ta1["options"], $parentReg)) {
+                        // Special case to copy parent options when relativeOrder is used
+                        if (($parentReg[1] || $parentReg[3]) && (!$attrReg[1] && ! $attrReg[3])) {
+                            // Copy on if no explicit option is set
+                            $tw->options=sprintf("%srelativeOrder=%s%s", $parentReg[1], $attrReg[2], $parentReg[3]);
+                        }
+                    }
+                }
+
                 foreach ($ta1 as $k => $v) {
                     if ($v && (!$ta->$k)) {
                         $tw->$k = $v;
