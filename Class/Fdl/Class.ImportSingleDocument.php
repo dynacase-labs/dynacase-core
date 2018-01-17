@@ -335,8 +335,13 @@ class importSingleDocument
                             /**
                              * Check for unknown logical names in docid's raw value
                              */
+                            if (is_string($dv)) {
+                                $dv = str_replace("\\n", "\n", $dv);
+                            }
                             $unknownLogicalNames = $this->getUnknownDocIdLogicalNames($this->doc, $attr, $dv);
+
                             if (count($unknownLogicalNames) > 0) {
+
                                 foreach ($unknownLogicalNames as $logicalName) {
                                     $warnMsg = sprintf(_("Unknown logical name '%s' in attribute '%s'.") , $logicalName, $attr->id);
                                     $this->doc->log->warning($warnMsg);
