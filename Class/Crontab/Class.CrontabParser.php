@@ -31,7 +31,8 @@ class CrontabParser
                     $crontabDocument->appendChild($currentSection);
                     $currentSection = null;
                 } else {
-                    $currentSection->appendChild(new CrontabTextElement($line));
+                    $newTextElement = new CrontabTextElement($line);
+                    $currentSection->appendChild($newTextElement);
                 }
             } else {
                 if (preg_match(self::REGEXP_SECTION_BEGIN, $line, $m)) {
@@ -40,7 +41,8 @@ class CrontabParser
                     }
                     $currentSection = new CrontabSectionElement($m['contextRoot'], $m['file']);
                 } else {
-                    $crontabDocument->appendChild(new CrontabTextElement($line));
+                    $newTextElement = new CrontabTextElement($line);
+                    $crontabDocument->appendChild($newTextElement);
                 }
             }
             $i++;
