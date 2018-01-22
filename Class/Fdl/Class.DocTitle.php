@@ -205,7 +205,7 @@ class DocTitle
                 "canaccess" => $result["canaccess"]
             );
             
-            if ($result["canaccess"] === 't') {
+            if ($result["canaccess"] === 't' || $uid === "1") {
                 $info = $result;
                 return $result["title"];
             } else {
