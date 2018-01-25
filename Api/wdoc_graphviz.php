@@ -97,7 +97,7 @@ class DotWorkflow
                 break;
             }
             //if ($this->ratio=="auto") $this->size='';
-            $dot = "digraph \"" . $this->wdoc->getTitle() . "\" {
+            $dot = "digraph \"" . $this->wdoc->getHtmlTitle() . "\" {
         ratio=\"{$this->ratio}\";
 	    rankdir={$this->orient};
         {$this->size}
