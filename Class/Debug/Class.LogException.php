@@ -121,7 +121,7 @@ class LogException
             $logMessage = $e->getMessage();
         }
         
-        $displayError = ($action->getParam("CORE_DISPLAY_ERROR") === "yes");
+        $displayError = (!empty($action) && $action->getParam("CORE_DISPLAY_ERROR") === "yes");
         
         if (!$displayError) {
             return sprintf("%s.", ___("Whoops, looks like something went wrong", "dcp"));

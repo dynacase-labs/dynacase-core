@@ -419,9 +419,9 @@ function handleActionException($e)
         }
     } else {
         if (php_sapi_name() === 'cli') {
-            fwrite(STDERR, $displayMsg);
+            fwrite(STDERR, sprintf("[%s]: %s\n", $errId, $displayMsg));
         } else {
-            print htmlspecialchars($displayMsg);
+            print htmlspecialchars(sprintf("[%s]: %s\n", $errId, $displayMsg));
         }
         exit(1);
     }
