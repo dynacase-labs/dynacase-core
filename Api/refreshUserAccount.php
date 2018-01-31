@@ -37,10 +37,10 @@ $query = new QueryDb("", "Account");
 if ($whatid > 0) {
     $query->AddQuery("id=$whatid");
 } else {
-    $query->order_by = "isgroup,id";
+    $query->order_by = "accounttype desc,id";
 }
 
-if ($onlygroup) $query->AddQuery("isgroup='Y'");
+if ($onlygroup) $query->AddQuery("accounttype='G'");
 
 $table1 = $query->Query(0, 0, "TABLE");
 
@@ -69,7 +69,7 @@ if ($query->nb > 0) {
         
         if (!$foundoc) {
             // search same doc with us_what id
-            if ($v["isgroup"] == "Y") {
+            if ($v["accounttype"] == "G") {
                 $filter = array(
                     "us_whatid = '" . $v["id"] . "'"
                 );
@@ -132,7 +132,7 @@ if ($query->nb > 0) {
                 }
             } else {
                 // create new card
-                if ($v["isgroup"] == "Y") {
+                if ($v["accounttype"] == "G") {
                     $iuser = createDoc($dbaccess, getFamIdFromName($dbaccess, "IGROUP"));
                     $iuser->setValue("US_WHATID", $v["id"]);
                     $iuser->Add();

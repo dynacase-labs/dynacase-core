@@ -381,6 +381,18 @@ class UserAccount extends \Dcp\Family\Document implements \IMailRecipient
             if ($arole["us_rolesorigin"] != "group") $roles[] = $arole["us_roles"];
         }
         $this->setValue("us_roles", $roles);
+
+        if ($this->getRawValue("us_whatid") == \Account::ANONYMOUS_ID) {
+            // Anonymous has no password
+            $passFrame=$this->getAttribute("us_passwd1");
+            if ($passFrame) {
+                $passFrame->setVisibility("H");
+            }
+            $passFrame=$this->getAttribute("us_passwd2");
+            if ($passFrame) {
+                $passFrame->setVisibility("H");
+            }
+        }
     }
     /**
      * recompute role attributes from system role
