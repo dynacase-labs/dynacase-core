@@ -96,7 +96,7 @@ if (isset($_GET["userid"])) { //special user
 }
 $core->Set("CORE", $CoreNull);
 $core->session = new Session();
-if (!isset($_GET["userid"])) $core->user = new Account("", 1); //admin
+if (!isset($_GET["userid"])) $core->user = new Account("", Account::ADMIN_ID); //admin
 ini_set("memory_limit", -1);
 
 initMainVolatileParam($core);

@@ -835,7 +835,7 @@ class DocCtrl extends DocLDAP
             }
             
             foreach ($ru as $k => $v) { // delete groups
-                if ($v["isgroup"] == "Y") unset($ru[$k]);
+                if ($v["accounttype"] == "G") unset($ru[$k]);
             }
         }
         return $ru;

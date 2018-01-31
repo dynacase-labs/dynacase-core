@@ -113,6 +113,8 @@ if [ "$1" = "U" ] ; then
     "$wpub"/wsh.php --api=import_size
 
     echo 'delete from permission where abs(id_acl) not in (select id from acl where acl.id_application=permission.id_application)' | PGSERVICE=$pgservice_core psql
+    # Invalid anonymous password
+    echo "update users set password = '-' where id = 3;" | PGSERVICE=$pgservice_core psql
 fi
 
 #------------------------------
