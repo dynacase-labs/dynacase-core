@@ -17,6 +17,6 @@ class CrontabDocument extends CrontabElement
             $previousElement = $currentElement;
             return true;
         });
-        return join("\n", $elements);
+        return join("\n", $elements) . "\n";
     }
 }
