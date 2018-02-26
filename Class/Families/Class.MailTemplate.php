@@ -300,11 +300,23 @@ class MailTemplate extends \Dcp\Family\Document
         ) , html_entity_decode($subject, ENT_COMPAT, "UTF-8"));
         $pfout = $this->generateMailInstance($doc, $this->getRawValue("tmail_body") , $this->getAttribute("tmail_body"));
         // delete empty address
-        $dest['to'] = array_filter($dest['to'], create_function('$v', 'return!preg_match("/^\s*$/", $v);'));
-        $dest['cc'] = array_filter($dest['cc'], create_function('$v', 'return!preg_match("/^\s*$/", $v);'));
-        $dest['bcc'] = array_filter($dest['bcc'], create_function('$v', 'return!preg_match("/^\s*$/", $v);'));
-        $dest['from'] = array_filter($dest['from'], create_function('$v', 'return!preg_match("/^\s*$/", $v);'));
-
+        $dest['to'] = array_filter($dest['to'], function ($v)
+        {
+            return !preg_match('/^\s*$/', $v);
+        });
+        $dest['cc'] = array_filter($dest['cc'], function ($v)
+        {
+            return !preg_match('/^\s*$/', $v);
+        });
+        $dest['bcc'] = array_filter($dest['bcc'], function ($v)
+        {
+            return !preg_match('/^\s*$/', $v);
+        });
+        $dest['from'] = array_filter($dest['from'], function ($v)
+        {
+            return !preg_match('/^\s*$/', $v);
+        });
+        
         $this->addSubstitutes($dest);
 
         $to = implode(',', $dest['to']);
