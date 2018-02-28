@@ -48,7 +48,7 @@ class ADoc
     public function getAttr($id)
     {
         if (isset($this->attr[$id])) return $this->attr[$id];
-        if (isset($this->attr[strtolower($id) ])) return $this->attr[$id];
+        if (isset($this->attr[strtolower($id) ])) return $this->attr[strtolower($id)];
         
         return false;
     }
