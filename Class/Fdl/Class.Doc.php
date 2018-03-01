@@ -2401,7 +2401,7 @@ create unique index i_docir on doc(initid, revision);";
         $tsa = array();
         
         foreach ($this->attributes->attr as $k => $v) {
-            if (get_class($v) == "FieldSetAttribute") $tsa[$v->id] = $v;
+            if (is_object($v) && (get_class($v) == "FieldSetAttribute")) $tsa[$v->id] = $v;
         }
         return $tsa;
     }
@@ -2437,7 +2437,7 @@ create unique index i_docir on doc(initid, revision);";
                 /**
                  * @var NormalAttribute $v
                  */
-                if ((get_class($v) == "NormalAttribute") && ($v->usefor != 'Q') && ($v->isInAbstract)) $tsa[$v->id] = $v;
+                if (is_object($v) && (get_class($v) == "NormalAttribute") && ($v->usefor != 'Q') && ($v->isInAbstract)) $tsa[$v->id] = $v;
             }
         }
         return $tsa;

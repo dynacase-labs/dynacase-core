@@ -48,7 +48,10 @@ function refreshGroups($groupIdList, $refresh = false, &$currentPath = array() ,
     // End of groups traversal
     if (count($currentPath) <= 0) {
         // We can now refresh the groups based on their ascending depth
-        uasort($groupDepth, create_function('$a,$b', 'return ($a-$b);'));
+        uasort($groupDepth, function ($a, $b)
+        {
+            return ($a - $b);
+        });
         foreach ($groupDepth as $group => $depth) {
             refreshOneGroup($group, $refresh);
         }

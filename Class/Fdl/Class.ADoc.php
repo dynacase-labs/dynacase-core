@@ -48,7 +48,7 @@ class ADoc
     public function getAttr($id)
     {
         if (isset($this->attr[$id])) return $this->attr[$id];
-        if (isset($this->attr[strtolower($id) ])) return $this->attr[$id];
+        if (isset($this->attr[strtolower($id) ])) return $this->attr[strtolower($id)];
         
         return false;
     }
@@ -98,7 +98,7 @@ class ADoc
         if (isset($this->attr)) {
             reset($this->attr);
             foreach ($this->attr as $k => $v) {
-                if ((get_class($v) == "NormalAttribute") && ($v->usefor == "Q")) $tsa[$v->id] = $v;
+                if (is_object($v) && (get_class($v) == "NormalAttribute") && ($v->usefor == "Q")) $tsa[$v->id] = $v;
             }
         }
         return $tsa;

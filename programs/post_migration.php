@@ -66,7 +66,11 @@ $err = getCheckActions($pubdir, array(
     $appname => $app
 ) , $actions, true);
 
-$postmigr = array_filter($actions, create_function('$x', "return preg_match('@/\\Q$appname\\E_(p|post)migr@', \$x);"));
+$appname_RE = preg_quote($appname, '@');
+$postmigr = array_filter($actions, function ($x) use ($appname_RE)
+{
+    return preg_match("@/${appname_RE}_(p|post)migr@", $x);
+});
 
 foreach ($postmigr as $cmd) {
     error_log(sprintf("Executing [%s]...", $cmd));
