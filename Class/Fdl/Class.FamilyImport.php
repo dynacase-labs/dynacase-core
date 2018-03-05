@@ -962,9 +962,13 @@ class FamilyImport
             $paf = array();
             foreach ($pa as $v) {
                 $paf[$v["id"]] = $v;
-                if (preg_match("/\bdoctitle=auto\b/", $v["options"])) {
+                if (preg_match('/\bdoctitle=(?P<attrid>[A-Za-z0-9_-]+)\b/', $v["options"], $m)) {
                     $vtitle = $v;
-                    $vtitle["id"] = $v["id"] . "_title";
+                    if ($m['attrid'] == 'auto') {
+                        $vtitle["id"] = $v["id"] . "_title";
+                    } else {
+                        $vtitle["id"] = strtolower($m['attrid']);
+                    }
                     $vtitle["type"] = "text";
                     $vtitle["options"] = "";
                     $paf[$vtitle["id"]] = $vtitle;
