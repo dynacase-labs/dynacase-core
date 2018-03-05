@@ -87,8 +87,13 @@ class TestAttributeDoctitle extends TestCaseDcpCommonFamily
                 "TST_DT4",
                 "TST2_AS1_TITLE",
                 "Rôle n°1\nRôle n°2"
+            ) ,
+
+            array(
+                "TST_DT4",
+                "TST_DOC3_DOCTITLE",
+                "Rôle n°1"
             )
         );
     }
 }
-?>
