@@ -127,8 +127,8 @@ class FamilyImport
         $query->AddQuery("docid=" . $tdoc["id"]);
         $query->order_by = "ordered";
         
-        $table1 = $query->Query();
-        
+        $docDbAttrs = $query->Query();
+
         $phpAdoc->Set("sattr", "");
         
         $phpAdoc->set("hasattr", false);
@@ -146,6 +146,12 @@ class FamilyImport
             /**
              * @var $v \DocAttr
              */
+            $table1=[];
+            foreach ($docDbAttrs as $k => $v) {
+                $table1[strtolower($v->id)]=$v;
+            }
+
+
             foreach ($table1 as $k => $v) {
                 $type = trim(strtok($v->type, "("));
                 if ($type === "docid" || $type == "account" || $type == "thesaurus") {
@@ -163,25 +169,30 @@ class FamilyImport
                             $doctitle = $v->id . "_title";
                         }
                         $doctitle = strtolower($doctitle);
-                        $table1[$doctitle] = clone ($v);
-                        $table1[$doctitle]->id = $doctitle;
-                        $table1[$doctitle]->type = "text";
-                        $table1[$doctitle]->visibility = "H";
-                        $table1[$doctitle]->phpfile = "";
-                        if (!preg_match("/docrev=(fixed|state)/", $v->options)) {
-                            $table1[$doctitle]->phpfunc = "::getLastTitle(" . $v->id . ",' )";
-                        } else {
-                            $table1[$doctitle]->phpfunc = "::getTitle(" . $v->id . ",' )";
+                        if (!isset($table1[strtolower($doctitle)])) {
+                            $table1[$doctitle] = clone ($v);
+                            $table1[$doctitle]->id = $doctitle;
+                            $table1[$doctitle]->type = "text";
+                            $table1[$doctitle]->visibility = "H";
+                            $table1[$doctitle]->phpfile = "";
+
+                            $table1[$doctitle]->options = "autotitle=yes|relativeOrder=" . $v->id;
+                            $table1[$doctitle]->title = "N";
+                            $table1[$doctitle]->abstract = "N";
+                            $table1[$doctitle]->needed = "N";
+                            $table1[$doctitle]->usefor = "A";
+                            $table1[$doctitle]->link = "";
+                            $table1[$doctitle]->phpconstraint = "";
+                            $table1[$doctitle]->labeltext = $v->labeltext . ' ' . _("(title)");
+                            $table1[$doctitle]->ordered = $v->ordered + 1;
                         }
-                        $table1[$doctitle]->options = "autotitle=yes|relativeOrder=" . $v->id;
-                        $table1[$doctitle]->title = "N";
-                        $table1[$doctitle]->abstract = "N";
-                        $table1[$doctitle]->needed = "N";
-                        $table1[$doctitle]->usefor = "A";
-                        $table1[$doctitle]->link = "";
-                        $table1[$doctitle]->phpconstraint = "";
-                        $table1[$doctitle]->labeltext = $v->labeltext . ' ' . _("(title)");
-                        $table1[$doctitle]->ordered = $v->ordered + 1;
+                        if (empty($table1[$doctitle]->phpfunc)) {
+                            if (!preg_match("/docrev=(fixed|state)/", $v->options)) {
+                                $table1[$doctitle]->phpfunc = "::getLastTitle(" . $v->id . ",' )";
+                            } else {
+                                $table1[$doctitle]->phpfunc = "::getTitle(" . $v->id . ",' )";
+                            }
+                        }
                     }
                 }
             }
