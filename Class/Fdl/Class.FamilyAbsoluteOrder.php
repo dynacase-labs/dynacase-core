@@ -58,7 +58,6 @@ class FamilyAbsoluteOrder
             self::updateAttributeTree($tree, $subTree);
         }
         self::checkTree($tree);
-        
         $linear = self::linearOrderTree($tree);
         foreach ($relativeOrders as $relativeOrder) {
             if (array_search($relativeOrder["id"], $linear) === false) {
@@ -108,8 +107,13 @@ class FamilyAbsoluteOrder
     {
         foreach ($familyAttributes as & $anAttribute) {
             $anAttribute["structLevel"] = self::getStructLevel($anAttribute["id"], $familyAttributes);
-            if ($anAttribute["numOrder"] === 0) {
-                $anAttribute["numOrder"] = self::getNumericOrder($anAttribute["id"], $familyAttributes);
+            if ($anAttribute["numOrder"] === 0 || (is_float($anAttribute["numOrder"]))) {
+                $absOrder = self::getNumericOrder($anAttribute["id"], $familyAttributes);
+                if ($anAttribute["numOrder"] === 0) {
+                    $anAttribute["numOrder"] = $absOrder;
+                } else {
+                    $anAttribute["numOrder"] = min($anAttribute["numOrder"], $absOrder);
+                }
             }
             $anAttribute["familyLevel"] = self::getFamilyLevel($anAttribute["family"]);
         }
@@ -207,7 +211,6 @@ class FamilyAbsoluteOrder
         }
         return $inherits[$familyId];
     }
-
     /**
      * Get structure level for an attribute (0 means top level  - for tabs or frame)
      *
@@ -244,6 +247,7 @@ class FamilyAbsoluteOrder
         $structLevel = $attr["structLevel"];
         $parent = $attr["parent"];
         $previous = self::firstOrder;
+        
         foreach ($sortedAttributes as $attribute) {
             if ($attribute["id"] === $attrid) {
                 return $previous;
@@ -252,7 +256,8 @@ class FamilyAbsoluteOrder
                 if ($attribute["parent"] === $parent) {
                     $previous = $attribute["id"];
                 } else {
-                    $previous = self::autoOrder;
+                    // $previous = self::autoOrder;
+                    
                 }
             }
         }
