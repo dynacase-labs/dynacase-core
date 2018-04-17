@@ -128,7 +128,7 @@ class FamilyImport
         $query->order_by = "ordered";
         
         $docDbAttrs = $query->Query();
-
+        
         $phpAdoc->Set("sattr", "");
         
         $phpAdoc->set("hasattr", false);
@@ -146,12 +146,11 @@ class FamilyImport
             /**
              * @var $v \DocAttr
              */
-            $table1=[];
+            $table1 = [];
             foreach ($docDbAttrs as $k => $v) {
-                $table1[strtolower($v->id)]=$v;
+                $table1[strtolower($v->id) ] = $v;
             }
-
-
+            
             foreach ($table1 as $k => $v) {
                 $type = trim(strtok($v->type, "("));
                 if ($type === "docid" || $type == "account" || $type == "thesaurus") {
@@ -169,13 +168,13 @@ class FamilyImport
                             $doctitle = $v->id . "_title";
                         }
                         $doctitle = strtolower($doctitle);
-                        if (!isset($table1[strtolower($doctitle)])) {
+                        if (!isset($table1[strtolower($doctitle) ])) {
                             $table1[$doctitle] = clone ($v);
                             $table1[$doctitle]->id = $doctitle;
                             $table1[$doctitle]->type = "text";
                             $table1[$doctitle]->visibility = "H";
                             $table1[$doctitle]->phpfile = "";
-
+                            
                             $table1[$doctitle]->options = "autotitle=yes|relativeOrder=" . $v->id;
                             $table1[$doctitle]->title = "N";
                             $table1[$doctitle]->abstract = "N";
@@ -197,6 +196,7 @@ class FamilyImport
                 }
             }
             $pM = new \parseFamilyMethod();
+            
             foreach ($pa as $parentAttr) {
                 $previousOrder = ""; //FamilyAbsoluteOrder::autoOrder;
                 if (preg_match("/relativeOrder=([A-Za-z0-9_:-]+)/", $parentAttr["options"], $reg)) {
@@ -204,12 +204,21 @@ class FamilyImport
                 }
                 if ($parentAttr["id"][0] !== ":") {
                     $allAttributes[$parentAttr["id"] . "/" . $parentAttr["docid"]] = ["id" => $parentAttr["id"], "parent" => $parentAttr["frameid"], "family" => $parentAttr["docid"], "prev" => $previousOrder, "numOrder" => intval($parentAttr["ordered"]) ];
+                    if (!$previousOrder) {
+                        // Need to copy child attribute when use absolute orders
+                        $allAttributes[$parentAttr["id"] . "/" . $tdoc["id"]] = $allAttributes[$parentAttr["id"] . "/" . $parentAttr["docid"]];
+                        $allAttributes[$parentAttr["id"] . "/" . $tdoc["id"]]["family"] = $tdoc["id"];
+                    }
                 } else {
                     if (is_numeric($parentAttr["ordered"])) {
                         $pattern = sprintf("/%s\\/([0-9]+)/", substr($parentAttr["id"], 1));
                         
                         foreach ($allAttributes as $ka => $attrData) {
                             if (preg_match($pattern, $ka, $reg)) {
+                                // Need to update parent also
+                                if ($parentAttr["frameid"]) {
+                                    $allAttributes[$ka]["parent"] = $parentAttr["frameid"];
+                                }
                                 $allAttributes[$ka]["numOrder"] = $parentAttr["ordered"];
                             }
                         }
@@ -228,6 +237,9 @@ class FamilyImport
                         $pattern = sprintf("/%s\\/([0-9]+)/", $v->id);
                         foreach ($allAttributes as $ka => $attrData) {
                             if (preg_match($pattern, $ka, $reg)) {
+                                if ($v->frameid) {
+                                    $allAttributes[$ka]["parent"] = $v->frameid;
+                                }
                                 $allAttributes[$ka]["numOrder"] = $v->ordered;
                             }
                         }
@@ -443,7 +455,9 @@ class FamilyImport
                         }
                 }
             }
+            
             FamilyAbsoluteOrder::completeForNumericOrder($allAttributes, $tdoc["id"]);
+            
             $absoluteOrders = FamilyAbsoluteOrder::getAbsoluteOrders($allAttributes, $tdoc["id"]);
             $tAbsOrders = [];
             foreach ($absoluteOrders as $kOrder => $attrid) {
@@ -920,18 +934,18 @@ class FamilyImport
             return $ta;
         } else {
             $tw = $ta;
-
+            
             foreach ($tas as $ta1) {
                 if (preg_match("/(.*)relativeOrder=([A-Za-z0-9_:-]+)(.*)/", $ta->options, $attrReg)) {
                     if (preg_match("/(.*)relativeOrder=([A-Za-z0-9_:-]+)(.*)/", $ta1["options"], $parentReg)) {
                         // Special case to copy parent options when relativeOrder is used
-                        if (($parentReg[1] || $parentReg[3]) && (!$attrReg[1] && ! $attrReg[3])) {
+                        if (($parentReg[1] || $parentReg[3]) && (!$attrReg[1] && !$attrReg[3])) {
                             // Copy on if no explicit option is set
-                            $tw->options=sprintf("%srelativeOrder=%s%s", $parentReg[1], $attrReg[2], $parentReg[3]);
+                            $tw->options = sprintf("%srelativeOrder=%s%s", $parentReg[1], $attrReg[2], $parentReg[3]);
                         }
                     }
                 }
-
+                
                 foreach ($ta1 as $k => $v) {
                     if ($v && (!$ta->$k)) {
                         $tw->$k = $v;
@@ -985,6 +999,7 @@ class FamilyImport
                     $paf[$vtitle["id"]] = $vtitle;
                 }
             }
+            
             return $paf;
         }
         return array();
