@@ -7,6 +7,7 @@
     <replaces>
         <module name="dynacase-platform" />
         <module name="dynacase-core-patchset-20170717" />
+        <module name="dynacase-core-patchset-7261" />
     </replaces>
 
     <requires>

@@ -130,7 +130,10 @@ class Session extends DbObj
          *     "/var/www/foo/bar/baz.php"
          *s
         */
-        $scriptFilename = $_SERVER['SCRIPT_FILENAME'];
+        $scriptFilename = realpath($_SERVER['SCRIPT_FILENAME']);
+        if ($scriptFilename === false) {
+            return false;
+        }
         /*
          * Remove leading context's pathname from script's filename:
          *
