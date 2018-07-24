@@ -123,7 +123,7 @@ class htmlAuthenticator extends Authenticator
         if (empty($this->parms['auth']['app'])) {
             throw new \Dcp\Exception("Missing html/auth/app config.");
         }
-        $location = Session::getWebRootPath();
+        $location = Session::getWebRootPath('/');
         $location.= 'authent.php?app=' . $this->parms['auth']['app'];
         if (!empty($this->parms['auth']['action'])) {
             $location.= '&action=' . $this->parms['auth']['action'];
