@@ -105,7 +105,7 @@ class Session extends DbObj
         return true;
     }
     
-    public static function getWebRootPath()
+    protected static function getWebRootPath_Apache()
     {
         if (!isset($_SERVER['SCRIPT_FILENAME'])) {
             return false;
@@ -163,15 +163,55 @@ class Session extends DbObj
         $webRoot = substr($scriptName, 0, $webRootLen);
         return $webRoot;
     }
+    
+    protected static function getWebRootPath_CoreUrlIndex()
+    {
+        $coreUrlIndex = \ApplicationParameterManager::getParameterValue('CORE', 'CORE_URLINDEX');
+        if (is_string($coreUrlIndex)) {
+            $tokens = parse_url($coreUrlIndex);
+            if (!isset($tokens['path'])) {
+                return '/';
+            }
+            $webRoot = $tokens['path'];
+            /* Append trailing '/' if not already present */
+            if (substr($webRoot, -1, 1) !== '/') {
+                $webRoot.= '/';
+            }
+            return $webRoot;
+        }
+        return false;
+    }
+
+    /**
+     * Try to autodetect « web root path » (i.e. the URL path as seen from the user stand point to reach the root of
+     * the Dynacase context).
+     *
+     * @param mixed $default The default value to return is all auto-detection fails.
+     * @return string|mixed Returns the « web root path » or the $default value if the path could not be detected with
+     * enough confidence
+     */
+    public static function getWebRootPath($default = false)
+    {
+        /*
+         * 1) Try to detect web root from CORE_URLINDEX
+        */
+        if (($webRoot = self::getWebRootPath_CoreUrlIndex()) !== false) {
+            return $webRoot;
+        }
+        /*
+         * 2) Try to detect web root from Apache environment variables
+        */
+        if (($webRoot = self::getWebRootPath_Apache()) !== false) {
+            return $webRoot;
+        }
+        return $default;
+    }
+    
     function setCookieSession($id, $ttl = 0)
     {
-        $webRootPath = self::getWebRootPath();
-        if ($webRootPath !== false) {
-            $cookiePath = preg_replace(':/+:', '/', $webRootPath);
-            $this->setcookie($this->name, $id, $ttl, $cookiePath, null, null, true);
-        } else {
-            $this->setcookie($this->name, $id, $ttl, null, null, null, true);
-        }
+        $webRootPath = self::getWebRootPath('/');
+        $cookiePath = preg_replace(':/+:', '/', $webRootPath);
+        $this->setcookie($this->name, $id, $ttl, $cookiePath, null, null, true);
     }
     /**
      * Closes session and removes all datas
@@ -556,10 +596,8 @@ class Session extends DbObj
     {
         if ($this->sendCookie) {
             if ($path === null) {
-                $webRootPath = self::getWebRootPath();
-                if ($webRootPath !== false) {
-                    $path = preg_replace(':/+:', '/', $webRootPath);
-                }
+                $webRootPath = self::getWebRootPath('/');
+                $path = preg_replace(':/+:', '/', $webRootPath);
             }
             return setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
