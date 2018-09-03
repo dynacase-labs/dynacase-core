@@ -174,7 +174,7 @@ class Message
     protected function addressesToString(array $tAddresses) {
         $tos=[];
         foreach ($tAddresses as $to) {
-            if ($to->address) {
+            if (is_a($to, 'Dcp\\Mail\\Address') && $to->address) {
                 if ($to->name) {
                     $tos[] = sprintf('"%s" <%s>', str_replace('"', ' ', $to->name), $to->address);
                 } else {
