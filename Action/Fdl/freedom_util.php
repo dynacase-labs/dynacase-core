@@ -842,7 +842,7 @@ function getLatestTDoc($dbaccess, $initid, $sqlfilters = array() , $fromid = fal
     getDbid($dbaccess);
     $table = "doc";
     if (!$fromid) {
-        simpleQuery($dbaccess, sprintf("select fromid from docread where initid=%d", $initid) , $tf, true);
+        simpleQuery($dbaccess, sprintf("select fromid from docread where initid=%d order by id desc limit 1", $initid) , $tf, true);
         if (count($tf) > 0) {
             $fromid = $tf[0];
         }
