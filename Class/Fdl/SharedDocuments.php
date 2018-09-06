@@ -37,6 +37,9 @@ class SharedDocuments
     public static function &get($key)
     {
         global $gdocs;
+        if (!isset($gdocs)) {
+            $gdocs = array();
+        }
         $null = null;
         if ($key === '' or $key === null or (!is_scalar($key))) {
             return $null;
@@ -57,6 +60,9 @@ class SharedDocuments
     public static function set($key, &$item, $force = false)
     {
         global $gdocs;
+        if (!isset($gdocs)) {
+            $gdocs = array();
+        }
         if ($key === '' or $key === null or (!is_scalar($key))) {
             return false;
         }
@@ -75,6 +81,9 @@ class SharedDocuments
     public static function remove($key)
     {
         global $gdocs;
+        if (!isset($gdocs)) {
+            $gdocs = array();
+        }
         if ($key === '' or $key === null or (!is_scalar($key))) {
             return false;
         }
@@ -98,6 +107,9 @@ class SharedDocuments
     public static function getKeys()
     {
         global $gdocs;
+        if (!isset($gdocs)) {
+            $gdocs = array();
+        }
         return array_keys($gdocs);
     }
     /**
@@ -108,6 +120,9 @@ class SharedDocuments
     public static function exists($key)
     {
         global $gdocs;
+        if (!isset($gdocs)) {
+            $gdocs = array();
+        }
         return array_key_exists($key, $gdocs);
     }
     /**
@@ -119,6 +134,9 @@ class SharedDocuments
     public static function isShared($key, &$item)
     {
         global $gdocs;
+        if (!isset($gdocs)) {
+            $gdocs = array();
+        }
         if ($key === '' or $key === null or (!is_scalar($key))) {
             return false;
         }
