@@ -155,6 +155,9 @@ create unique index idx_perm on docperm(docid, userid);";
     // --------------------------------------------------------------------
     function ControlMask($acl, $pos)
     {
+        if ($pos < 0) {
+            return false;
+        }
         return (($acl & (1 << ($pos))) != 0);
     }
     /**
@@ -170,7 +173,9 @@ create unique index idx_perm on docperm(docid, userid);";
      */
     function SetControlP($pos)
     {
-        $this->upacl = intval($this->upacl) | (1 << $pos);
+        if ($pos >= 0) {
+            $this->upacl = intval($this->upacl) | (1 << $pos);
+        }
     }
     /**
      * unset positive ACL in specified position
@@ -178,7 +183,9 @@ create unique index idx_perm on docperm(docid, userid);";
      */
     function UnSetControlP($pos)
     {
-        $this->upacl = $this->upacl & (~(1 << $pos));
+        if ($pos >= 0) {
+            $this->upacl = $this->upacl & (~(1 << $pos));
+        }
     }
     public static function getPermsForDoc($docid)
     {
