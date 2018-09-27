@@ -217,26 +217,19 @@ class MailTemplate extends \Dcp\Family\Document
                             if (strpos($aid, ':')) {
                                 $mail = $udoc->getRValue($aid);
                             } else {
-                                if ($type == "DE") {
-                                    /**
-                                     * @var \Dcp\Family\IUSER|\Dcp\Family\IGROUP|\Dcp\Family\ROLE $aDoc
-                                     */
-                                    $aDoc = new_Doc("", $vdocid);
-                                    $mail = '';
-                                    if (method_exists($aDoc, "getMail")) {
-                                        $mail = $aDoc->getMail();
-                                    }
-                                    if (!$mail) {
-                                        $mail = $aDoc->getRawValue('us_mail', '');
-                                    }
-                                    if (!$mail) {
-                                        $mail = $aDoc->getRawValue('grp_mail', '');
-                                    }
-                                } else {
-                                    $mail = $udoc->getRValue($aid . ':us_mail');
-                                    if (!$mail) {
-                                        $mail = $udoc->getRValue($aid . ':grp_mail');
-                                    }
+                                /**
+                                 * @var \Dcp\Family\IUSER|\Dcp\Family\IGROUP|\Dcp\Family\ROLE $aDoc
+                                 */
+                                $aDoc = new_Doc("", $vdocid);
+                                $mail = '';
+                                if (method_exists($aDoc, "getMail")) {
+                                    $mail = $aDoc->getMail();
+                                }
+                                if (!$mail) {
+                                    $mail = $aDoc->getRawValue('us_mail', '');
+                                }
+                                if (!$mail) {
+                                    $mail = $aDoc->getRawValue('grp_mail', '');
                                 }
                             }
                         }
