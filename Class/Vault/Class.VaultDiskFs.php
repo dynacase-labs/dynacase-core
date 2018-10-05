@@ -165,10 +165,12 @@ EOF;
 select vaultdiskfsstorage.*, y.size 
 from vaultdiskfsstorage, ( 
     select sum(c) as size, id_fs from (
-                (select sum(vaultdiskstorage.size) as c, vaultdiskdirstorage.id_fs 
-                from vaultdiskstorage, vaultdiskdirstorage 
-                where vaultdiskdirstorage.id_dir = vaultdiskstorage.id_dir and not isfull 
-                group by vaultdiskdirstorage.id_fs )
+                (
+                  SELECT CASE WHEN sum(vaultdiskstorage.size) IS NULL THEN 0 ELSE sum(vaultdiskstorage.size) END AS c, vaultdiskdirstorage.id_fs 
+                  FROM vaultdiskstorage RIGHT JOIN vaultdiskdirstorage ON (vaultdiskdirstorage.id_fs = vaultdiskstorage.id_fs AND vaultdiskdirstorage.id_dir = vaultdiskstorage.id_dir)
+                  WHERE NOT vaultdiskdirstorage.isfull
+                  GROUP BY vaultdiskdirstorage.id_fs
+                )
             union
                 (select sum(size) as c, vaultdiskdirstorage.id_fs 
                 from vaultdiskdirstorage 
