@@ -35,13 +35,18 @@ if ($appid) $param->AddQuery("appid=$appid");
 $list = $param->Query(0, 2);
 if ($param->nb == 0) {
     printf(_("Attribute %s not found\n") , $parname);
+    exit(1);
 } elseif ($param->nb > 1) {
     printf(_("Attribute %s found is not alone\nMust precise request with appname arguments\n") , $parname);
+    exit(1);
 } else {
     /** @var Param $p */
     $p = $list[0];
     $p->val = $parval;
     $err = $p->modify();
-    if ($err != "") printf(_("Attribute %s not modified : %s\n") , $parname, $err);
+    if ($err != "") {
+        printf(_("Attribute %s not modified : %s\n") , $parname, $err);
+        exit(1);
+    }
     else printf(_("Attribute %s modified to %s") , $parname, $parval);
 }
