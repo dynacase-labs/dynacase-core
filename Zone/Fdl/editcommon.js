@@ -1371,13 +1371,6 @@ function submitEdit(event,force) {
         }
 
 		if (r) {
-			if (isIE) {
-                $('#fedit').trigger('submit');
-			} else {
-				oEvent = document.createEvent("HTMLEvents");
-				oEvent.initEvent("submit",false,false);
-				fedit.dispatchEvent(oEvent);
-			}
 			fedit.submit();
             restoreall();
 		}
