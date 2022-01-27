@@ -7435,11 +7435,11 @@ msgid "produce link for"
 msgstr ""
 
 #, php-format
-msgid "profil id unknow %s"
+msgid "profile id unknown %s"
 msgstr ""
 
 #, php-format
-msgid "profil id unkonow %s"
+msgid "profile id unknown %s"
 msgstr ""
 
 msgid "profile access"
